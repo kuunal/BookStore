@@ -23,10 +23,13 @@ class ProductManager():
 
     @staticmethod
     def get(id):
-        query = f'select * from product where id = {id}';
+        if id.isnumeric():
+            query = f'select * from product where id = {id}';
+        else:
+            query = f'select * from product where title = {id} or author = {id}';
         return ProductManager.all(query)
         
-        
+
 class Product:
     objects = ProductManager()
 
