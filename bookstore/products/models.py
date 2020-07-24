@@ -1,7 +1,7 @@
 from django.db import models
 from django.db import connection 
     
-    
+
 class ProductManager():
 
     @staticmethod
@@ -25,6 +25,8 @@ class ProductManager():
     def get(id):
         query = f'select * from product where id = {id}';
         return ProductManager.all(query)
+        
+        
 class Product:
     objects = ProductManager()
 
