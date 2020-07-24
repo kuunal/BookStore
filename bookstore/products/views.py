@@ -10,7 +10,10 @@ from .models import Product
 # Create your views here.
 class ProductView(APIView):
 
-    def get(self, request):
-        products = Product.objects.all()
+    def get(self, request, pk=None):
+        if pk:
+            products = Product.objects.get(pk)
+        else:
+            products = Product.objects.all()
         serializer = prod_serializer(products, many=True)
         return Response(serializer.data)
