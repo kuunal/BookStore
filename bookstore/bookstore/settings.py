@@ -136,3 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# CELERY_RESULT_BACKEND = 'database'
+CELERY_RESULT_BACKEND = 'db+mysql://root:1234@localhost:3306/celery'
+CELERY_CACHE_BACKEND = 'django-cache'
