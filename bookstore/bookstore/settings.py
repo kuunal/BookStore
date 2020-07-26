@@ -87,11 +87,11 @@ WSGI_APPLICATION = 'bookstore.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'DATABASE_NAME',
-        'USER': 'DATABASE_USER',
-        'PASSWORD': 'DATABASE_PASSWORD',
-        'HOST': 'DATABASE_HOST',
-        'PORT': 'DATABASE_PORT'
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT
     }
 }
 
