@@ -7,7 +7,7 @@ def send_otp(phone_no):
     characters_for_otp = '1234567890abcdefghijklmnopqrstuvwxyz'
     number_of_character_in_otp = 6
     random_otp = ""
-
+    
     for characters in range(number_of_character_in_otp):
         random_otp+=random.choice(characters_for_otp)
 
