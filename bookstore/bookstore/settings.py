@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import environ
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
@@ -138,5 +140,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # CELERY_RESULT_BACKEND = 'database'
-CELERY_RESULT_BACKEND = 'db+mysql://root:1234@localhost:3306/celery'
-CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
+
+# CELERY_CACHE_BACKEND = 'django-cache'
