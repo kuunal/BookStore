@@ -16,7 +16,6 @@ from bookstore.redis_setup import get_redis_instance
 
 class LoginView(APIView):   
     serializer_class = LoginSerializer
-    redis_instance  = get_redis_instance()
 
     def post(self, request):
         login_id = request.data['login_id']
@@ -35,7 +34,6 @@ class LoginView(APIView):
                     except ValidationError as e:
                         return Response({'status':400,'message':str(e)})
                     random_otp = gen_otp()
-                    print(otp)
                     # send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
                     return Response(200)
@@ -47,19 +45,25 @@ class LoginView(APIView):
 
 
 
-class VerifyOTPView():
+class VerifyOTPView(APIView):
     def post(self, request):
-        phone_no = request.headers.get(x_phoneno)
+        phone_no = request.headers.get('x_phoneno')
         otp = request.data['otp']
         redis_instance  = get_redis_instance()
         cursor = conn.cursor()
-        cursor.execute('select otp, email from otp_history where phone_no = %s and otp = %s', [phone_no, otp])
+        cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
+        original_otps = cursor.fetchall() 
         if otp:
-            latest_otp = otp[:-1][0]
-            if otp == latest_otp:
-                redis_instance.set(otp[:-1][1], otp)
-                cursor.execute('delete from otp_history where phone_no = %s', [phone_no,])
+            latest_otp = original_otps[len(original_otps)-1][0]
+            latest_otp_send_time  = original_otps[len(original_otps)-1][1]
+            elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()
+            
+            if otp == latest_otp and elasped_time < 300 :
+                # redis_instance.set(otp[:-1][1], otp)
+                cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
                 return Response(200)
+            else:
+                return Response({'status':401,'message':'OTP is expired'})
         else:
             return Response({'status':401,'message':'Invalid OTP'})
         
