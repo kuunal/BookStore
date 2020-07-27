@@ -39,6 +39,7 @@ def check_if_user_is_blocked(phone_no):
             remaining_time = calculate_remaining_block_time(block_time)
             if remaining_time < 0:
                 raise ValidationError("You are blocked for trying so many times. Please come back after "+ str(abs(remaining_time)) +" Hours")
-
+            else:
+                cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
     finally:
         cursor.close()
