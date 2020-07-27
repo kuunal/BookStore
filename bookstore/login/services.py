@@ -18,3 +18,27 @@ def check_if_otp_generated_for_more_than_limit_for_user(phone_no):
             raise ValidationError("You have tried too many times. Please come back again tommorow")
     finally:
         cursor.close()
+
+
+def calculate_remaining_block_time(block_time):
+    remaining_block_time = (timezone.now() - block_time).total_seconds()//3600
+    print(remaining_block_time, block_time)
+    return remaining_block_time 
+                
+        
+
+def check_if_user_is_blocked(phone_no):
+    try:
+        current_time = timezone.now()
+        cursor = cn.cursor()
+        cursor.execute('select datetime from otp_history where phone_no = %s and otp = %s', [phone_no, "blockd"] )
+        block_time = cursor.fetchall()
+        if block_time :
+            block_time = block_time[:1][0][0]
+
+            remaining_time = calculate_remaining_block_time(block_time)
+            if remaining_time < 0:
+                raise ValidationError("You are blocked for trying so many times. Please come back after "+ str(abs(remaining_time)) +" Hours")
+
+    finally:
+        cursor.close()
