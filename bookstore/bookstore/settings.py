@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import environ
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
@@ -22,6 +24,16 @@ environ.Env.read_env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
+DATABASE_NAME = env('DATABASE_NAME')
+DATABASE_USER = env('DATABASE_USER')
+DATABASE_PASSWORD = env('DATABASE_PASSWORD')
+DATABASE_HOST = env('DATABASE_HOST')
+DATABASE_PORT = env('DATABASE_PORT')
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
+TWILIO_NUMBER=env('TWILIO_NUMBER')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,6 +46,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'products',
     'rest_framework',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,11 +92,11 @@ WSGI_APPLICATION = 'bookstore.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'book_store',
-        'USER': 'root',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '3306'
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT
     }
 }
 
@@ -112,16 +125,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# CELERY_RESULT_BACKEND = 'database'
+CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
+
+# CELERY_CACHE_BACKEND = 'django-cache'
