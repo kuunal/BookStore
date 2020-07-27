@@ -7,5 +7,5 @@ MESSAGE_FOR_LOGIN="Your otp is "
 
 
 @shared_task
-def send_otp_to_user_while_login(phone_no):
-    send_otp(phone_no)
+def send_otp_to_user_while_login(phone_no, random_otp):
+    send_otp(phone_no, random_otp)
