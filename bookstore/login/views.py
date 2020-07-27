@@ -34,9 +34,9 @@ class LoginView(APIView):
                     except ValidationError as e:
                         return Response({'status':400,'message':str(e)})
                     random_otp = gen_otp()
-                    # send_otp_to_user_while_login.delay(phone_no, random_otp) 
+                    send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
-                    return Response(200)
+                    return Response({'status':200, 'message':'Please verify by entering OTP sent to you'})
             except Exception as e:
                 return Response(e)
             finally:

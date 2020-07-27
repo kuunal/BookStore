@@ -26,7 +26,8 @@ class ProductManager():
         if id.isnumeric():
             query = f'select * from product where id = {id}';
         else:
-            query = f'select * from product where title = {id} or author = {id}';
+            id = id+"%"
+            query = f'select * from product where LOWER(title) like "{id}" or LOWER(author) LIKE "{id}"';
         return ProductManager.all(query)
         
 

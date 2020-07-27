@@ -13,6 +13,7 @@ class ProductView(APIView):
 
     def get(self, request, pk=None):
         if pk:
+            pk = pk.lower()
             products = Product.objects.get(pk)
         else:
             products = Product.objects.all()
