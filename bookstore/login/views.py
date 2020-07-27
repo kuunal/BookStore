@@ -35,12 +35,31 @@ class LoginView(APIView):
                     except ValidationError as e:
                         return Response({'status':400,'message':str(e)})
                     random_otp = gen_otp()
-                    send_otp_to_user_while_login.delay(phone_no, random_otp) 
+                    print(otp)
+                    # send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
-                    LoginView.redis_instance.set(phone_no, random_otp)
                     return Response(200)
             except Exception as e:
-                return Response(str(e))
+                return Response(e)
             finally:
                 cursor.close()
         return Response(401)
+
+
+
+class VerifyOTPView():
+    def post(self, request):
+        phone_no = request.headers.get(x_phoneno)
+        otp = request.data['otp']
+        redis_instance  = get_redis_instance()
+        cursor = conn.cursor()
+        cursor.execute('select otp, email from otp_history where phone_no = %s and otp = %s', [phone_no, otp])
+        if otp:
+            latest_otp = otp[:-1][0]
+            if otp == latest_otp:
+                redis_instance.set(otp[:-1][1], otp)
+                cursor.execute('delete from otp_history where phone_no = %s', [phone_no,])
+                return Response(200)
+        else:
+            return Response({'status':401,'message':'Invalid OTP'})
+        
