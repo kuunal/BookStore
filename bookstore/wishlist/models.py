@@ -1,7 +1,7 @@
 from django.db import models, connection
 
-class wishlistsModel:
-    objects = wishlistsManager()
+class WishListModel:
+    objects = WishListsManager()
 
     def __init__(self):
         self.user_id = None
@@ -14,7 +14,7 @@ class wishlistsModel:
         else:
             self.objects.update(self)
 
-class wishlistsManager:
+class WishListsManager:
     
     @staticmethod
     def insert(obj):
@@ -41,10 +41,16 @@ class wishlistsManager:
     def all():
         try:
             cursor = connection.cursor()
-            cursor.execute('select product_id from wishlists')
             objects = []
-            
-
+            user_id = get_current_user()
+            cursor.execute('select * from wishlists where user_id = %s')
+            wishlist = cursor.fetchall()
+            for wishlist in wishlists:
+                wishlist_object = WishListModel()
+                wishlist_object.user_id = row[0]
+                wishlist_object_product_id = row[1]
+                objects.append(wishlist_object)
+            return objects
 
 
 

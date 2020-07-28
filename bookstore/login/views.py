@@ -56,15 +56,14 @@ class VerifyOTPView(APIView):
         original_otps = cursor.fetchall() 
         if otp:
             latest_otp = original_otps[len(original_otps)-1][0]
-            latest_otp_send_time  = original_otps[len(original_otps)-1][1]
+            latest_otp_send_time  = original_otps[len(original_otps)-1][1]  
             elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()
-            
             if otp == latest_otp and elasped_time < 300 :
                 cursor.execute('select id from users where phone_no = %s',[phone_no])
                 user_id = cursor.fetchall()[0][0]
-                redis_instance.set(user_id, phone_no)
+                redis_instance.set(phone_no, user_id)
                 cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
-                return Response(200)
+                return Response({'status':200, 'message':'Successfully verified'})
             else:
                 return Response({'status':401,'message':'OTP is invalid!'})
         else:
