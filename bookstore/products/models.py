@@ -30,6 +30,16 @@ class ProductManager():
             query = f'select * from product where LOWER(title) like "{id}" or LOWER(author) LIKE "{id}"';
         return ProductManager.all(query)
         
+    @staticmethod
+    def filter(objects):
+        # if len(objects)==0:
+        #     return None
+        result = []
+        for obj in objects:
+            result.extend(ProductManager.get(str(obj.product_id))) 
+        return result
+
+
 
 class Product:
     objects = ProductManager()
