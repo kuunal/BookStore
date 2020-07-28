@@ -4,6 +4,7 @@ from .views import WishListView
 
 
 urlpatterns = [
-    path('/', WishListView.as_view())
+    path('/', WishListView.as_view()),
+    path('/<str:id>', WishListView.as_view()),
 ]
 
