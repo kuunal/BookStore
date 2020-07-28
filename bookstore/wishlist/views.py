@@ -5,10 +5,10 @@ from .serializer import WishListSerializer
 from .models import WishListModel
 from rest_framework.response import Response
 from products.models import Product
+from .services import get_current_user
 from products.serializer import ProductSerializer
 
 class WishListView(APIView):
-    serializer_class = WishListSerializer
     def get(self, request, id=None):
         wishlist = WishListModel.objects.all() 
         if id:
@@ -20,4 +20,14 @@ class WishListView(APIView):
             products = Product.objects.filter(wishlist)
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
+
+
+    def post(self, request):
+        product_id = request.data['product_id']
+        serializer = WishListSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status':200, 'message':'Added to wishlist'})
+        return Response({'status':400, 'message':'invalid product'})
+
         

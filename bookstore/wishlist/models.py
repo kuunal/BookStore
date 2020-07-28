@@ -7,7 +7,7 @@ class WishListsManager:
     def insert(obj):
         try:
             cursor = connection.cursor()
-            cursor.execute('insert into wishlists values(%s, %s)',(obj.user_id, obj.product_id))
+            cursor.execute('insert into wishlists(user_id, product_id) values(%s, %s)',(obj.user_id, obj.product_id))
         finally:
             cursor.close()
 
@@ -46,6 +46,7 @@ class WishListModel:
     objects = WishListsManager()
 
     def __init__(self):
+        self.id = None
         self.user_id = None
         self.product_id = None
 
