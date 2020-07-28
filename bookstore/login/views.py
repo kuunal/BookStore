@@ -44,14 +44,15 @@ class LoginView(APIView):
         return Response(401)
 
 
-
 class VerifyOTPView(APIView):
     def post(self, request):
         phone_no = request.headers.get('x_phoneno')
         otp = request.data['otp']
         redis_instance  = get_redis_instance()
-        cursor = conn.cursor()
-        cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
+        try:
+            cursor = conn.cursor()
+            cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
+        
         original_otps = cursor.fetchall() 
         if otp:
             latest_otp = original_otps[len(original_otps)-1][0]
@@ -59,11 +60,13 @@ class VerifyOTPView(APIView):
             elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()
             
             if otp == latest_otp and elasped_time < 300 :
-                # redis_instance.set(otp[:-1][1], otp)
+                cursor.execute('select id from users where phone_no = %s',[phone_no])
+                user_id = cursor.fetchall()[0][0]
+                redis_instance.set(user_id, phone_no)
                 cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
                 return Response(200)
             else:
-                return Response({'status':401,'message':'OTP is expired'})
+                return Response({'status':401,'message':'OTP is invalid!'})
         else:
-            return Response({'status':401,'message':'Invalid OTP'})
+            return Response({'status':401,'message':'You havent requested for OTP!'})
         
