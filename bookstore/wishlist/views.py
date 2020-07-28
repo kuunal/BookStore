@@ -9,9 +9,15 @@ from products.serializer import ProductSerializer
 
 class WishListView(APIView):
     serializer_class = WishListSerializer
-    def get(self, request):
+    def get(self, request, id=None):
         wishlist = WishListModel.objects.all() 
-        products = Product.objects.filter(wishlist)
+        if id:
+            try:
+                products = Product.objects.get(str(wishlist[int(id)].product_id))
+            except IndexError:
+                return Response({'status':'400', 'message':'No such product'})
+        else:
+            products = Product.objects.filter(wishlist)
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
         
