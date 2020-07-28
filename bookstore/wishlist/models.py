@@ -1,18 +1,5 @@
 from django.db import models, connection
-
-class WishListModel:
-    objects = WishListsManager()
-
-    def __init__(self):
-        self.user_id = None
-        self.product_id = None
-
-    def save(self):
-
-        if self.id is None:
-            self.objects.insert(self)
-        else:
-            self.objects.update(self)
+from .services import get_current_user
 
 class WishListsManager:
     
@@ -43,16 +30,31 @@ class WishListsManager:
             cursor = connection.cursor()
             objects = []
             user_id = get_current_user()
-            cursor.execute('select * from wishlists where user_id = %s')
-            wishlist = cursor.fetchall()
-            for wishlist in wishlists:
+            cursor.execute('select * from wishlists where user_id = %s', [user_id,] )
+            wishlists = cursor.fetchall()
+            for row in wishlists:
                 wishlist_object = WishListModel()
-                wishlist_object.user_id = row[0]
-                wishlist_object_product_id = row[1]
+                wishlist_object.user_id = row[1]
+                wishlist_object.product_id = row[2]
                 objects.append(wishlist_object)
             return objects
+        finally:
+            cursor.close()
 
 
+class WishListModel:
+    objects = WishListsManager()
+
+    def __init__(self):
+        self.user_id = None
+        self.product_id = None
+
+    def save(self):
+
+        if self.id is None:
+            self.objects.insert(self)
+        else:
+            self.objects.update(self)
 
 
     
