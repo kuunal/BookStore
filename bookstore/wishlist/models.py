@@ -4,6 +4,11 @@ from .services import get_current_user
 class WishListsManager:
     
     @staticmethod
+    def get(id):
+        query=f'select * from wishlists where id={id}'
+        return WishListsManager.all(query)[0]
+
+    @staticmethod
     def insert(obj):
         try:
             cursor = connection.cursor()
@@ -21,16 +26,20 @@ class WishListsManager:
 
     
     @staticmethod
-    def delete(obj):
-        pass
+    def delete(id):
+        try:
+            cursor = connection.cursor()
+            cursor.execute('delete from wishlists where id=%s' ,(id))
+        finally:
+            cursor.close()
 
     @staticmethod
-    def all():
+    def all(query='select * from wishlists'):
         try:
             cursor = connection.cursor()
             objects = []
             user_id = get_current_user()
-            cursor.execute('select * from wishlists where user_id = %s', [user_id,] )
+            cursor.execute(query)
             wishlists = cursor.fetchall()
             for row in wishlists:
                 wishlist_object = WishListModel()
