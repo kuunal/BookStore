@@ -36,7 +36,7 @@ class LoginView(APIView):
                     random_otp = gen_otp()
                     send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
-                    return Response({'status':200, 'message':'Please verify by entering OTP sent to you'})
+                    return Response(responses['otp_sent'])
             except Exception as e:
                 return Response(e)
             finally:
@@ -53,7 +53,7 @@ class VerifyOTPView(APIView):
             cursor = conn.cursor()
             cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
         
-            original_otps = cursor.fetchall() 
+            original_otps = cursor.fetchall()
             if otp:
                 latest_otp = original_otps[len(original_otps)-1][0]
                 latest_otp_send_time  = original_otps[len(original_otps)-1][1]  
@@ -63,11 +63,11 @@ class VerifyOTPView(APIView):
                     user_id = cursor.fetchall()[0][0]
                     redis_instance.set(phone_no, user_id)
                     cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
-                    return Response({'status':200, 'message':'Successfully verified'})
+                    return Response(responses['verify_response'])
                 else:
-                    return Response({'status':401,'message':'OTP is invalid!'})
+                    return Response(responses['otp_invalid'])
             else:
-                return Response({'status':401,'message':'You havent requested for OTP!'})
+                return Response(responses['otp_not_generated'])
         finally:
             cursor.close()
         
