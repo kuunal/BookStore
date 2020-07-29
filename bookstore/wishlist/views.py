@@ -6,7 +6,7 @@ from .models import WishListModel
 from rest_framework.response import Response
 from products.models import Product
 from .services import get_current_user
-from products.serializer import ProductSerializer
+from .serializer import ProductSerializer
 
 class WishListView(APIView):
     def get(self, request, id=None):
@@ -34,8 +34,6 @@ class WishListView(APIView):
         
 
     def delete(self, request, id):
-        # wishlist = WishListModel.objects.all() 
-        # products = Product.objects.get(str(wishlist[int(id)].product_id))
         WishListModel.objects.delete(id)
         return Response({'status':200, 'message':'Deleted from wishlist'})
 

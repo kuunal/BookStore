@@ -11,6 +11,7 @@ class ProductManager():
         objects = []
         for row in cursor.fetchall():
             product_object = Product()
+            product_object.id = row[0]
             product_object.author = row[6]
             product_object.title = row[1]
             product_object.image = row[2]

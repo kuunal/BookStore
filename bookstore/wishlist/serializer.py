@@ -19,6 +19,15 @@ class WishListSerializer(serializers.Serializer):
         return wishlist_obj
 
 
+class ProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    author = serializers.CharField(max_length=255)
+    title = serializers.CharField(max_length=255)
+    image = serializers.CharField(max_length=255)
+    price = serializers.IntegerField()
+    description = serializers.CharField(max_length=255)
+    
+
 
 
 

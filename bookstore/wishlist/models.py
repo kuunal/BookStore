@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.db import models, connection
 from .services import get_current_user
 
@@ -5,14 +7,16 @@ class WishListsManager:
     
     @staticmethod
     def get(id):
-        query=f'select * from wishlists where id={id}'
+        query=f'select * from wishlists where product_id={id}'
         return WishListsManager.all(query)[0]
 
     @staticmethod
     def insert(obj):
         try:
             cursor = connection.cursor()
-            cursor.execute('insert into wishlists(user_id, product_id) values(%s, %s)',(obj.user_id, obj.product_id))
+            result = cursor.execute('insert into wishlists(user_id, product_id) values(%s, %s)',(obj.user_id, obj.product_id))
+        except IntegrityError as e:
+            raise ValidationError(str(e))
         finally:
             cursor.close()
 
@@ -29,7 +33,7 @@ class WishListsManager:
     def delete(id):
         try:
             cursor = connection.cursor()
-            cursor.execute('delete from wishlists where id=%s' ,(id))
+            cursor.execute('delete from wishlists where product_id=%s and user_id=%s' ,(id,get_current_user()))
         finally:
             cursor.close()
 
