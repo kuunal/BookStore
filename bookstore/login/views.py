@@ -1,3 +1,4 @@
+import jwt
 from django.shortcuts import render
 from rest_framework.views import APIView
 from django.db import connection as conn
@@ -11,6 +12,9 @@ from django.utils import timezone
 from datetime import timedelta
 from .services import check_if_otp_generated_for_more_than_limit_for_user, check_if_user_is_blocked
 from bookstore.redis_setup import get_redis_instance
+from bookstore import settings
+from response_codes import get_response_code
+
 
 # Create your views here.
 
@@ -36,9 +40,9 @@ class LoginView(APIView):
                     random_otp = gen_otp()
                     send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
-                    return Response(responses['otp_sent'])
-            except Exception as e:
-                return Response(e)
+                    return Response(get_response_code('otp_sent'))
+            except TypeError:
+                return Response(get_response_code('login_failed')) 
             finally:
                 cursor.close()
         return Response(serializer.errors)
@@ -52,7 +56,7 @@ class VerifyOTPView(APIView):
         try:
             cursor = conn.cursor()
             cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
-        
+
             original_otps = cursor.fetchall()
             if otp:
                 latest_otp = original_otps[len(original_otps)-1][0]
@@ -61,13 +65,14 @@ class VerifyOTPView(APIView):
                 if otp == latest_otp and elasped_time < 300 :
                     cursor.execute('select id from users where phone_no = %s',[phone_no])
                     user_id = cursor.fetchall()[0][0]
-                    redis_instance.set(phone_no, user_id)
+                    token = jwt.encode({'phone_no':phone_no, 'user_id':user_id},settings.JWT_SECRET_KEY)
+                    redis_instance.set(user_id, token)
                     cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
-                    return Response(responses['verify_response'])
+                    return Response(get_response_code('verify_response'),{'token':token})
                 else:
-                    return Response(responses['otp_invalid'])
+                    return Response(get_response_code('otp_invalid'))
             else:
-                return Response(responses['otp_not_generated'])
+                return Response(get_response_code('otp_not_generated'))
         finally:
             cursor.close()
         

@@ -16,7 +16,7 @@ class WishListSerializer(serializers.Serializer):
         wishlist_obj.user_id = get_current_user()
         wishlist_obj.product_id = validated_data['product_id']
         wishlist_obj.save()
-        return wishlist_obj
+        return wishlist_obj 
 
 
 class ProductSerializer(serializers.Serializer):

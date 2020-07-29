@@ -38,11 +38,13 @@ class WishListsManager:
             cursor.close()
 
     @staticmethod
-    def all(query='select * from wishlists'):
+    def all(query=None):
         try:
             cursor = connection.cursor()
             objects = []
             user_id = get_current_user()
+            if query == None:
+                query = f'select * from wishlists where user_id = {get_current_user()}'
             cursor.execute(query)
             wishlists = cursor.fetchall()
             for row in wishlists:

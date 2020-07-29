@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from django.db import connection as conn
 from .serializer import ProductSerializer as prod_serializer
 from .models import Product
+from response_codes import get_response_code
 
 # Create your views here.
 class ProductView(APIView):
@@ -18,4 +19,5 @@ class ProductView(APIView):
         else:
             products = Product.objects.all()
         serializer = prod_serializer(products, many=True)
-        return Response(serializer.data)
+        response = serializer.data
+        return Response(response) if response else Response (get_response_code('invalid_product_id'))
