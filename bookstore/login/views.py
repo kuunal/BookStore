@@ -14,6 +14,7 @@ from .services import check_if_otp_generated_for_more_than_limit_for_user, check
 from bookstore.redis_setup import get_redis_instance
 from bookstore import settings
 from response_codes import get_response_code
+from .default_jwt import jwt_encode
 
 
 # Create your views here.
@@ -38,7 +39,7 @@ class LoginView(APIView):
                     except ValidationError as e:
                         return Response({'status':400,'message':str(e)})
                     random_otp = gen_otp()
-                    send_otp_to_user_while_login.delay(phone_no, random_otp) 
+                    # send_otp_to_user_while_login.delay(phone_no, random_otp) 
                     cursor.execute('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
                     return Response(get_response_code('otp_sent'))
             except TypeError:
@@ -58,17 +59,19 @@ class VerifyOTPView(APIView):
             cursor.execute('select otp, datetime from otp_history where phone_no = %s', [phone_no])
 
             original_otps = cursor.fetchall()
-            if otp:
+            if len(otp)>0:
                 latest_otp = original_otps[len(original_otps)-1][0]
                 latest_otp_send_time  = original_otps[len(original_otps)-1][1]  
                 elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()
-                if otp == latest_otp and elasped_time < 300 :
+                if otp == latest_otp and int(elasped_time) < int(settings.OTP_EXPIRY_TIME): 
                     cursor.execute('select id from users where phone_no = %s',[phone_no])
                     user_id = cursor.fetchall()[0][0]
-                    token = jwt.encode({'phone_no':phone_no, 'user_id':user_id},settings.JWT_SECRET_KEY)
+                    token = jwt_encode(user_id)
                     redis_instance.set(user_id, token)
                     cursor.execute('delete from otp_history where phone_no = %s', [phone_no])
-                    return Response(get_response_code('verify_response'),{'token':token})
+                    response = get_response_code('verify_response')
+                    response['token']=token
+                    return Response(response)
                 else:
                     return Response(get_response_code('otp_invalid'))
             else:

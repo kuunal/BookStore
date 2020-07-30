@@ -24,6 +24,9 @@ environ.Env.read_env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
+JWT_SECRET_KEY = env('JWT_SECRET_KEY')
+JWT_EXPIRATION_TIME = env('JWT_EXPIRATION_TIME')
+OTP_EXPIRY_TIME = env('OTP_EXPIRY_TIME')
 REDIS_HOST = env('REDIS_HOST')
 REDIS_PORT = env('REDIS_PORT')
 DATABASE_NAME = env('DATABASE_NAME')

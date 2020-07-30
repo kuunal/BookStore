@@ -1,14 +1,14 @@
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.db import models, connection
-from .services import get_current_user
 
 class WishListsManager:
     
     @staticmethod
-    def get(id):
-        query=f'select * from wishlists where product_id={id}'
-        return WishListsManager.all(query)[0]
+    def get(id, user_id):
+        query=f'select * from wishlists where product_id=%s and user_id = %s'
+        params = (id, user_id)
+        return WishListsManager.all(query, params)[0]
 
     @staticmethod
     def insert(obj):
@@ -19,33 +19,24 @@ class WishListsManager:
             raise ValidationError(str(e))
         finally:
             cursor.close()
-
-    @staticmethod
-    def update(obj):
-        try:
-            cursor = connection.cursor()
-            cursor.execute('update wishlists set values(%s,%s) where user_id=%s' ,(obj.user_id, obj.product_id, obj.id))
-        finally:
-            cursor.close()
-
     
     @staticmethod
-    def delete(id):
+    def delete(id, user_id):
         try:
             cursor = connection.cursor()
-            cursor.execute('delete from wishlists where product_id=%s and user_id=%s' ,(id,get_current_user()))
+            cursor.execute('delete from wishlists where product_id=%s and user_id=%s' ,(id, user_id))
         finally:
             cursor.close()
 
     @staticmethod
-    def all(query=None):
+    def all(query=None,params=None):
         try:
             cursor = connection.cursor()
             objects = []
-            user_id = get_current_user()
             if query == None:
-                query = f'select * from wishlists where user_id = {get_current_user()}'
-            cursor.execute(query)
+                query = 'select * from wishlists where user_id = %s' 
+                params = (params,)
+            cursor.execute(query, params)
             wishlists = cursor.fetchall()
             for row in wishlists:
                 wishlist_object = WishListModel()
@@ -60,10 +51,10 @@ class WishListsManager:
 class WishListModel:
     objects = WishListsManager()
 
-    def __init__(self):
-        self.id = None
-        self.user_id = None
-        self.product_id = None
+    def __init__(self, id=None, user_id=None, product_id=None ):
+        self.id = id
+        self.user_id = user_id
+        self.product_id = product_id
 
     def save(self):
 

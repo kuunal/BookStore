@@ -2,6 +2,18 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import connection as cn
 from datetime import timedelta
+from bookstore import settings
+from bookstore.redis_setup import get_redis_instance
+from .default_jwt import jwt_decode
+
+def get_current_user(request):
+    redis_instance = get_redis_instance()
+    token = request.headers.get("x_token")
+    user_id = jwt_decode(token)
+    for key in redis_instance.scan_iter():
+        if key.decode('utf-8') == str(user_id):   
+            return user_id
+
 
 
 def check_if_otp_generated_for_more_than_limit_for_user(phone_no):

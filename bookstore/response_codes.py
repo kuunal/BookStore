@@ -15,3 +15,4 @@ responses= {
 
 def get_response_code(key):
     return responses[key]
+
