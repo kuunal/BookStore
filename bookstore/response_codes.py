@@ -9,7 +9,7 @@ responses= {
      'otp_sent' : {'status':200, 'message':'Please verify by entering OTP sent to you'},
      'login_failed' : {'status': 401, 'message':'invalid Id or pass'},
      'product_already_in_wishlist' : {'status': 400, 'message':'Product already in wishlist'},
-    
+     'wishlist_delete_does_exists':{'status':400, 'message':'No such item in wishlist'}
     }
 
 
