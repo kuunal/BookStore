@@ -1,41 +1,43 @@
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.db import models, connection
+from response_codes import get_response_code
 
 class WishListsManager:
     
     @staticmethod
-    def get(id, user_id):
-        query=f'select * from wishlists where product_id=%s and user_id = %s'
-        params = (id, user_id)
+    def get(id, user_id, table="wishlists"):
+        query=f'select * from '+table+' where product_id=%s and user_id = %s'
+        params = ( id, user_id)
         return WishListsManager.all(query, params)[0]
 
     @staticmethod
-    def insert(obj):
+    def insert(obj, table="wishlists"):
         try:
             cursor = connection.cursor()
-            result = cursor.execute('insert into wishlists(user_id, product_id) values(%s, %s)',(obj.user_id, obj.product_id))
+            result = cursor.execute('insert into '+table+'(user_id, product_id) values(%s, %s)',(obj.user_id, obj.product_id))
         except IntegrityError as e:
             raise ValidationError(str(e))
         finally:
             cursor.close()
     
     @staticmethod
-    def delete(id, user_id):
+    def delete(id, user_id, table="wishlists"):
         try:
             cursor = connection.cursor()
-            cursor.execute('delete from wishlists where product_id=%s and user_id=%s' ,(id, user_id))
+            result = cursor.execute('delete from '+table+' where product_id=%s and user_id=%s' ,(id, user_id))
+            return result
         finally:
             cursor.close()
 
     @staticmethod
-    def all(query=None,params=None):
+    def all(query=None,params=None, table="wishlists"):
         try:
             cursor = connection.cursor()
             objects = []
             if query == None:
-                query = 'select * from wishlists where user_id = %s' 
-                params = (params,)
+                query = 'select * from '+table+' where user_id = %s' 
+                params = ( params,)
             cursor.execute(query, params)
             wishlists = cursor.fetchall()
             for row in wishlists:
