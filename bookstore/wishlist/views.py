@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from .serializer import WishListSerializer
 from .models import WishListModel
 from rest_framework.response import Response
 from products.models import Product
@@ -52,7 +51,9 @@ class WishListView(APIView):
 
     def delete(self, request, id):
         user_id = get_current_user(request)
-        WishListModel.objects.delete(id, user_id)
+        result = WishListModel.objects.delete(id, user_id)
+        if result == 0:
+            return Response(get_response_code('wishlist_delete_does_exists'))
         return Response(get_response_code('deleted_wishlist_item'))
 
 
