@@ -32,7 +32,7 @@ def check_if_otp_generated_for_more_than_limit_for_user(phone_no):
 
 
 def calculate_remaining_block_time(block_time):
-    remaining_block_time = (timezone.now() - block_time).total_seconds()//3600
+    remaining_block_time = (timezone.now() - block_time).total_seconds()//settings.OTP_BLOCK_TIME
     print(remaining_block_time, block_time)
     return remaining_block_time 
                 
