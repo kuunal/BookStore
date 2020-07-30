@@ -25,28 +25,6 @@ class WishListView(APIView):
             products = Product.objects.filter(wishlist)
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
-
-
-    # def post(self, request):
-    #     product_id = request.data['product_id']
-        # user_id  = get_current_user(request)
-        # serializer = WishListSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     try:
-        #         cursor = connection.cursor()
-        #         cursor.execute('select count(*) from wishlists where product_id = %s and user_id = %s', (product_id, user_id) )
-        #         count = cursor.fetchone()
-        #         count = count[0]
-        #         if count > 0:
-        #             return Response(get_response_code('product_already_in_wishlist'))
-        #     except IntegrityError:
-        #         return Response(get_response_code('invalid_product_id'))
-        #     finally:
-        #         cursor.close()
-        #     serializer.save(user_id=user_id)
-        #     return Response(get_response_code('added_to_wishlist'))
-        # return Response(get_response_code('invalid_product'))
-
         
 
     def delete(self, request, id):
@@ -70,10 +48,10 @@ def add_to_wishlist(request):
         count = count[0]
         if count > 0:
             return Response(get_response_code('product_already_in_wishlist'))
+        wishlist = WishListModel(user_id=user_id, product_id=product_id)
+        wishlist.save()
     except IntegrityError:
         return Response(get_response_code('invalid_product_id'))
     finally:
         cursor.close()
-    wishlist = WishListModel(user_id=user_id, product_id=product_id)
-    wishlist.save()
     return Response(get_response_code('added_to_wishlist'))
