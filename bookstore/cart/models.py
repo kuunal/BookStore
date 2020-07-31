@@ -1,25 +1,65 @@
-from django.db import models
+from django.db import models, connection
 from wishlist.models import WishListsManager
-
+from django.core.exceptions import ValidationError
+from response_codes import get_response_code
+from products.models import Product
 
 class CartManager:
     
     @staticmethod
-    def all(params=None):
-        query = 'select * from cart where user_id = %s'
-        return WishListsManager.all(query,(params,), CartModel)
+    def all(user_id=None, params=None, query=None):
+        try:
+            cursor = connection.cursor()
+            if not query:
+                query = 'select p.*, c.quantity as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
+                params = (user_id,)
+            cursor.execute(query, params)
+        # total = sum(product.price  for product in products )
+            result = cursor.fetchall()
+            objects = []
+            for row in result:
+                obj = CartModel()
+                obj.id = row[0]
+                obj.title = row[1]
+                obj.image = row[2]
+                obj.quantity = row[3]
+                obj.price = row[4]
+                obj.description = row[5]
+                obj.author = row[6]
+                obj.quantity_in_cart = row[7]
+
+                objects.append(obj)
+            return objects
+        finally:
+            cursor.close()
         
 
     @staticmethod
     def get(id, user_id):
-        query = 'select * from cart where product_id = %s and user_id =%s'
-        model = CartModel
-        return WishListsManager.get(id, user_id, query, model)
+        query = 'select p.*, c.quantity as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
+        params = (user_id, id)
+        return CartManager.all(query=query,params=params)
 
     @staticmethod
     def insert(obj):
-        query = 'insert into cart(user_id, product_id) values(%s, %s)'
-        return WishListsManager.insert(obj, query)
+        try:
+            cursor = connection.cursor()
+            cursor.execute('select quantity from cart where product_id = %s and user_id = %s', (obj.product_id, obj.user_id) )
+            count = cursor.fetchone()
+            if count:
+                count = count[0]
+                cursor.execute('select quantity from product where id = %s', (obj.product_id,))
+                total_quantity = cursor.fetchone()[0]
+                if total_quantity >= count + int(obj.quantity):
+                    result = cursor.execute('update cart set quantity = %s where  product_id = %s and user_id = %s', (count+int(obj.quantity), obj.product_id, obj.user_id))
+                    return get_response_code('added_quantity')
+                else:
+                    raise ValidationError("Product out of stock for that quantity")
+            query = 'insert into cart(user_id, product_id, quantity) values(%s, %s, %s)'
+                    
+            return WishListsManager.insert(obj, query, (obj.user_id, obj.product_id, obj.quantity))
+        finally:
+            cursor.close()
 
     @staticmethod
     def delete(id, user_id):
@@ -30,17 +70,25 @@ class CartManager:
     def update(id):
         pass
 
-class CartModel:
+class CartModel(Product):
     objects = CartManager()
 
-    def __init__(self, id=None, user_id=None, product_id=None, total=None):
+    
+    def __init__(self, id=None, title=None, image=None, author=None, quantity_in_cart=None, quantity=None, price=None, description = None, user_id=None, product_id=None):
         self.id = id
+        self.title = title
+        self.image = image
+        self.author = author
+        self.quantity_in_cart = quantity_in_cart
+        self.quantity = quantity
+        self.price = price
+        self.description = description
         self.user_id = user_id
         self.product_id = product_id
-        self.total = total
 
     def save(self):
         if self.id:
-            self.objects.update(self)
+            return self.objects.update(self)
         else:
-            self.objects.insert(self)
+            return self.objects.insert(self)
+
