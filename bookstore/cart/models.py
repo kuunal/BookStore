@@ -12,7 +12,7 @@ class CartManager:
 
     @staticmethod
     def get(id, user_id):
-        query = 'select * from cart where id = %s and user_id =%s'
+        query = 'select * from cart where product_id = %s and user_id =%s'
         model = CartModel
         return WishListsManager.get(id, user_id, query, model)
 
