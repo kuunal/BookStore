@@ -8,21 +8,22 @@ from django.db import connection, IntegrityError
 from login.services import get_current_user
 from .models import CartModel
 from response_codes import get_response_code
+from django.core.exceptions import ValidationError
+from .serializers import CartSerializer
 
 class CartView(APIView):
     def get(self, request, id=None):
         user_id  = get_current_user(request)
         if id:
             try:
-                cart_items = CartModel.objects.get(id, user_id)
-                products = Product.objects.get(str(cart_items.product_id))
+                result = CartModel.objects.get(id, user_id)
             except IndexError:
                 return Response(get_response_code('invalid_product_id'))
         else:
-            cart_items = CartModel.objects.all(params=user_id)
-            products = Product.objects.filter(cart_items)
-        serializer = ProductSerializer(products, many = True)
-        return Response(serializer.data)
+            result = CartModel.objects.all(user_id)
+        total = sum([total.price if total.quantity_in_cart == 1 else total.price*total.quantity_in_cart for total in result])
+        serializer = CartSerializer(result, many = True)
+        return Response({'cart':serializer.data, 'total':total})
 
     def delete(self, request, id):
         user_id = get_current_user(request)
@@ -34,20 +35,16 @@ class CartView(APIView):
 @api_view(('GET',))
 def add_to_cart(request):
     product_id = request.GET.get('id')
-    if not product_id.isnumeric():
+    quantity = 1 if request.GET.get('quantity') == None else request.GET.get('quantity')
+    if not product_id.isnumeric() and not quantity.isnumeric():
         return Response(get_response_code('invalid_product'))
     user_id  = get_current_user(request)
     try:
-        cursor = connection.cursor()
-        cursor.execute('select count(*) from cart where product_id = %s and user_id = %s', (product_id, user_id) )
-        count = cursor.fetchone()
-        count = count[0]
-        if count > 0:
-            return Response(get_response_code('product_already_in_wishlist'))
-        cart_item = CartModel(user_id=user_id, product_id=product_id)
-        cart_item.save()
+        cart_item = CartModel(user_id=user_id, product_id=product_id, quantity=quantity)
+        result = cart_item.save()
+        return Response(result)
+    except ValidationError:
+        return Response({'status':400, 'message':'Product out of stock'})
     except IntegrityError:
         return Response(get_response_code('invalid_product_id'))
-    finally:
-        cursor.close()
     return Response(get_response_code('added_to_wishlist'))

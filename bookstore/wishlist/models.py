@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.db import models, connection
+from response_codes import get_response_code
 
 class WishListsManager:
     
@@ -12,10 +13,13 @@ class WishListsManager:
         return WishListsManager.all(query, params, model)[0]
 
     @staticmethod
-    def insert(obj, query='insert into wishlists(user_id, product_id) values(%s, %s)'):
+    def insert(obj, query='insert into wishlists(user_id, product_id) values(%s, %s)',  params=None):
         try:
             cursor = connection.cursor()
-            result = cursor.execute(query,(obj.user_id, obj.product_id))
+            if params == None:
+                params = (obj.user_id, obj.product_id)
+            result = cursor.execute(query, params)
+            return get_response_code('added_to_wishlist')
         finally:
             cursor.close()
     
