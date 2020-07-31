@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from products.models import Product
 from login.services import get_current_user
 from rest_framework.decorators import api_view
-
 from .serializer import ProductSerializer
 from response_codes import get_response_code
 from django.db import connection, IntegrityError
