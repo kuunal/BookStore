@@ -5,7 +5,7 @@ from response_codes import get_response_code
 from products.models import Product
 
 class CartManager:
-    
+
     @staticmethod
     def all(user_id=None, params=None, query=None):
         try:
@@ -14,7 +14,6 @@ class CartManager:
                 query = 'select p.*, c.quantity as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
                 params = (user_id,)
             cursor.execute(query, params)
-        # total = sum(product.price  for product in products )
             result = cursor.fetchall()
             objects = []
             for row in result:
@@ -50,9 +49,9 @@ class CartManager:
                 count = count[0]
                 cursor.execute('select quantity from product where id = %s', (obj.product_id,))
                 total_quantity = cursor.fetchone()[0]
-                if total_quantity >= count + int(obj.quantity):
-                    result = cursor.execute('update cart set quantity = %s where  product_id = %s and user_id = %s', (count+int(obj.quantity), obj.product_id, obj.user_id))
-                    return get_response_code('added_quantity')
+                if total_quantity >= int(obj.quantity):
+                    result = cursor.execute('update cart set quantity = %s where  product_id = %s and user_id = %s', (int(obj.quantity), obj.product_id, obj.user_id))
+                    return get_response_code('updated_quantity')
                 else:
                     raise ValidationError("Product out of stock for that quantity")
             query = 'insert into cart(user_id, product_id, quantity) values(%s, %s, %s)'

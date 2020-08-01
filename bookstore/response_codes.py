@@ -11,7 +11,8 @@ responses= {
      'product_already_in_wishlist' : {'status': 400, 'message':'Product already in wishlist'},
      'wishlist_delete_does_exists':{'status':400, 'message':'No such item in wishlist'},
      'added_to_wishlist' : {'status':200, 'message':'Added to cart'},
-     'added_quantity': {'status':200, 'message':'Increased quantity, since product already in cart'}
+     'updated_quantity': {'status':200, 'message':'Updated quantity successfully'},
+     'out_of_stock' : {'status':400, 'message':'Product out of stock for that quantity'},
     }
 
 
