@@ -4,11 +4,12 @@ from bookstore import settings
 from django.db import connection as conn
 from datetime import datetime
 from django.utils import timezone
+from response_codes import TOTAL_NUMBER_OF_OTP_CHARACTER
 
 
 def gen_otp():
     characters_for_otp = '1234567890abcdefghijklmnopqrstuvwxyz'
-    number_of_character_in_otp = 6
+    number_of_character_in_otp = TOTAL_NUMBER_OF_OTP_CHARACTER
     random_otp = ""
     for characters in range(number_of_character_in_otp):
         random_otp+=random.choice(characters_for_otp)

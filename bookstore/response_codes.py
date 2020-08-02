@@ -1,7 +1,7 @@
 TOTAL_NUMBER_OF_OTP_CHARACTER = 6
 JWT_EXPIRATION_TIME=300
 OTP_EXPIRY_TIME=300
-OTP_BLOCK_TIME=3600
+OTP_BLOCK_TIME=3600 
 
 responses= {
      'invalid_login' :{'status':400, 'message':'Invalid login_id'},
