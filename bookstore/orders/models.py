@@ -6,11 +6,11 @@ class OrderManager:
     
 
     @staticmethod
-    def filter(user_id):
+    def filter(user_id, query=None,params=None):
         try:
             cursor = connection.cursor()
             query = ''' select * from orders where o.user_id = %s and paid = %s'''
-            params = (user_id, 1,)
+            params = (user_id, 0,)
             cursor.execute(query, params)
             records = cursor.fetchall()
             for row in records:
@@ -28,14 +28,12 @@ class OrderManager:
     def insert(obj):
         try:
             cursor = connection.cursor()
-            cursor.execute('select quantity from product where id = %s', (obj.quantity,))
-            if cursor.fetchone()[0] < obj.quantity:
-                return None 
-            query = 'insert into addresses(user_id, product_id, quantity, address, paid, is_delivered) values(%s, %s, %s, %s, %s, %s)'
+            query = 'insert into orders(user_id, product_id, quantity, address) values(%s, %s, %s, %s)'
             params = (obj.user_id, obj.quantity, obj.product_id, obj.address, 0, 0)
-            result =  WishListsManager.insert(query, params)
-            if result > 0:
-                cursor.execute('update product set quantity = ')
+            result =  WishListsManager.insert(None,query, params)
+            if result:
+                cursor.execute('update orders set total = (select price from product where id=%s,)* obj.quantity where user_id =%s and product_id=%s', (obj.product_id, obj.user_id, obj.product_id))
+                cursor.execute('update product p1 join product p2 set p1.quantity = p2.quantity-%s where p1.id = %s', (obj.product_id, obj.quantity, obj.product_id))
             return result
         except:
             cursor.close()
@@ -48,19 +46,18 @@ class OrderManager:
 class OrderModel:
     objects = OrderManager()
 
-    def __init__(self, id=None, order_id=None, user_id=None, quantity=None, total=None, address=None, paid=None, is_delivered=None):
+    def __init__(self, id=None, product_id=None, user_id=None, quantity=None, price=None, total=None, address=None):
         self.id = id
-        self.order_id = order_id
+        self.product_id = product_id
         self.user_id = user_id 
         self.quantity = quantity
         self.total = total
+        self.price = price
         self.address = address
-        self.paid = paid
-        self.is_delivered = is_delivered
 
     def save(self):
         if not self.id:
-            self.objects.insert()
+            self.objects.insert(self)
 
 
 

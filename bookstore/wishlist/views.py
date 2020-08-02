@@ -20,7 +20,7 @@ class WishListView(APIView):
             except IndexError:
                 return Response(get_response_code('invalid_product_id'))
         else:
-            wishlist = WishListModel.objects.all(params=user_id)
+            wishlist = WishListdModel.objects.all(params=user_id)
             products = Product.objects.filter(wishlist)
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
