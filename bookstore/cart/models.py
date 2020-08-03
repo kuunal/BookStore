@@ -11,21 +11,22 @@ class CartManager:
         try:
             cursor = connection.cursor()
             if not query:
-                query = 'select p.*, c.quantity as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
+                query = 'select p.*, c.quantity, c.user_id as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
                 params = (user_id,)
             cursor.execute(query, params)
             result = cursor.fetchall()
             objects = []
             for row in result:
                 obj = CartModel()
-                obj.id = row[0]
+                obj.product_id = row[0]
                 obj.title = row[1]
                 obj.image = row[2]
-                obj.quantity = row[3]
+                obj.quantity = row[7]
                 obj.price = row[4]
                 obj.description = row[5]
                 obj.author = row[6]
                 obj.quantity_in_cart = row[7]
+                obj.user_id = row[8]
 
                 objects.append(obj)
             return objects
@@ -35,7 +36,7 @@ class CartManager:
 
     @staticmethod
     def get(id, user_id):
-        query = 'select p.*, c.quantity as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
+        query = 'select p.*, c.quantity from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
         params = (user_id, id)
         return CartManager.all(query=query,params=params)
 
@@ -73,12 +74,11 @@ class CartModel(Product):
     objects = CartManager()
 
     
-    def __init__(self, id=None, title=None, image=None, author=None, quantity_in_cart=None, quantity=None, price=None, description = None, user_id=None, product_id=None):
+    def __init__(self, id=None, title=None, image=None, author=None, quantity=None, price=None, description = None, user_id=None, product_id=None):
         self.id = id
         self.title = title
         self.image = image
         self.author = author
-        self.quantity_in_cart = quantity_in_cart
         self.quantity = quantity
         self.price = price
         self.description = description
