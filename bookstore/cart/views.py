@@ -10,6 +10,8 @@ from .models import CartModel
 from response_codes import get_response_code
 from django.core.exceptions import ValidationError
 from .serializers import CartSerializer
+from orders.services import get_latest_order_id
+from orders.models import OrderManager
 
 class CartView(APIView):
     def get(self, request, id=None):
@@ -31,6 +33,16 @@ class CartView(APIView):
         if result == 0:
             return Response(get_response_code('wishlist_delete_does_exists'))
         return Response(get_response_code('deleted_wishlist_item'))
+
+    def post(self, request):
+        user_id =2
+        address = request.data['address']
+        result = CartModel.objects.all(user_id)
+        total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
+        id = get_latest_order_id()
+        OrderManager.insert(result, total, address, id)
+        return Response(200)
+
 
 @api_view(('GET',))
 def add_to_cart(request):

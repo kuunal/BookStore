@@ -1,6 +1,7 @@
 from django.db import models, connection
 from wishlist.models import WishListsManager
 from django.core.exceptions import ValidationError
+from .services import get_latest_order_id
 
 
 class OrderManager:
@@ -31,34 +32,31 @@ class OrderManager:
             cursor.close()
 
     @staticmethod
-    def insert(obj, params=None, total=None):
+    def insert(obj, total=None, address=None, id = None):
         try:
             cursor = connection.cursor()
-            cursor.execute('select order_id from orders order by order_id desc limit 1')
-            id = cursor.fetchone()
-            if id:
-                id = id[0]
-            else:
-                id=1
-            cursor.execute('select quantity,price from product where id = %s', (obj.product_id,))
-            available_quantity = cursor.fetchone()[0]
-            price = cursor.fetchone()[1]
-            if not params:
-                params = [(obj.user_id, obj.product_id, obj.quantity, obj.address, id),]
-                total = obj.quantity * price 
-            for orders in params:
+            id = get_latest_order_id()
+            
+            for orders in obj:
+                cursor.execute('select quantity,price from product where id = %s', (orders.product_id,))
+                result = cursor.fetchone()
+                available_quantity = result[0]
+                price = result[1]
+                if not address:
+                    address = orders.address
+                    total = orders.quantity * price 
                 if  available_quantity == 0 :
                     raise ValidationError("Product out of stock") 
-                if available_quantity < obj.quantity:
+                if available_quantity < orders.quantity:
                     raise ValidationError("Product out of stock for that quantity") 
                 
                 query = 'insert into orders(user_id, product_id, quantity, address, order_id) values(%s, %s, %s, %s, %s)'
 
-                result =  cursor.execute(query, orders)
+                result =  cursor.execute(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
                 if result:
-                    cursor.execute('update product set quantity = quantity-%s where id = %s', (obj.quantity, obj.product_id))
-                return result
-        
+                    cursor.execute('update product set quantity = quantity-%s where id = %s', (orders.quantity, orders.product_id))
+
+            order_placed_mail_to_user.delay(obj, total)
         finally:
             cursor.close()
 
@@ -81,7 +79,7 @@ class OrderModel:
 
     def save(self):
         if not self.id:
-            self.objects.insert(self)
+            self.objects.insert([self,])
 
 
 
