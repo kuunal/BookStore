@@ -12,8 +12,11 @@ from django.core.exceptions import ValidationError
 from .serializers import CartSerializer
 from orders.services import get_latest_order_id
 from orders.models import OrderManager
+from login.services import login_required
 
 class CartView(APIView):
+    
+    @login_required
     def get(self, request, id=None):
         user_id  = get_current_user(request)
         if id:
@@ -27,6 +30,7 @@ class CartView(APIView):
         serializer = CartSerializer(result, many = True)
         return Response({'cart':serializer.data, 'total':total})
 
+    @login_required
     def delete(self, request, id):
         user_id = get_current_user(request)
         result = CartModel.objects.delete(id, user_id)
@@ -34,6 +38,7 @@ class CartView(APIView):
             return Response(get_response_code('wishlist_delete_does_exists'))
         return Response(get_response_code('deleted_wishlist_item'))
 
+    @login_required
     def post(self, request):
         user_id =2
         address = request.data['address']
@@ -43,8 +48,8 @@ class CartView(APIView):
         OrderManager.insert(result, total, address, id)
         return Response(200)
 
-
 @api_view(('GET',))
+@login_required
 def add_to_cart(request):
     product_id = request.GET.get('id')
     quantity = 1 if request.GET.get('quantity') == None else request.GET.get('quantity')

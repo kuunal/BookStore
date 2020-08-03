@@ -7,10 +7,11 @@ from response_codes import get_response_code
 from .models import OrderModel
 from login.tasks import order_placed_mail_to_user
 from bookstore import settings
+from login.services import login_required
 
 # Create your views here.
 class OrderView(APIView):
-
+    @login_required
     def get(self, request):
         user_id = get_current_user(request)
         orders = OrderModel.objects.filter(user_id)
@@ -19,7 +20,7 @@ class OrderView(APIView):
         return Response({'order':serializer.data, 'total':total})
         
         
-
+    @login_required
     def post(self, request):
         user_id = get_current_user(request)
         serializer = OrderSerializer(data=request.data)

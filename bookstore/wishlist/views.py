@@ -11,6 +11,8 @@ from response_codes import get_response_code
 from django.db import connection, IntegrityError
 
 class WishListView(APIView):
+
+    @login_required
     def get(self, request, id=None):
         user_id  = get_current_user(request)
         if id:
@@ -25,7 +27,7 @@ class WishListView(APIView):
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
         
-
+    @login_required
     def delete(self, request, id):
         user_id = get_current_user(request)
         result = WishListModel.objects.delete(id, user_id)
@@ -35,6 +37,7 @@ class WishListView(APIView):
 
 
 @api_view(('GET',))
+@login_required
 def add_to_wishlist(request):
     product_id = request.GET.get('id')
     if not product_id.isnumeric():
