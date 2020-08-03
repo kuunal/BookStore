@@ -5,6 +5,10 @@ from datetime import timedelta
 from bookstore import settings
 from bookstore.redis_setup import get_redis_instance
 from .default_jwt import jwt_decode
+from response_codes import get_response_code
+from rest_framework import authentication, exceptions
+from bookstore.book_store_exception import LoginRequiredError
+
 
 def get_current_user(request):
     redis_instance = get_redis_instance()
@@ -14,7 +18,14 @@ def get_current_user(request):
         if key.decode('utf-8') == str(user_id):   
             return user_id
     
-
+def login_required(func):
+    def wrapper(request, *args, **kwargs):
+        try:
+            get_current_user(request)
+            return func(request, *args, **kwargs)
+        except exceptions.AuthenticationFailed:
+            raise LoginRequiredError(get_response_code('login_required'))
+    return wrapper
 
 def check_if_otp_generated_for_more_than_limit_for_user(phone_no):
     try:
