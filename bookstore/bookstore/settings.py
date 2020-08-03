@@ -42,9 +42,9 @@ TWILIO_NUMBER = env('TWILIO_NUMBER')
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = env('ID')
+EMAIL_HOST_USER = env('EMAIL_ID')
 EMAIL_HOST_PASSWORD = env('PASS')
-EMAIL_PORT = 587
+EMAIL_PORT = 587    
 HOST = 'localhost'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -82,7 +82,7 @@ ROOT_URLCONF = 'bookstore.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

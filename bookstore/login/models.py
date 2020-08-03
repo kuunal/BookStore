@@ -11,3 +11,5 @@ class LoginManager:
             cursor.execute('Select email from users where id = %s', (user_id,))
             user_email = cursor.fetchall()[0]
             return user_email
+        finally :
+            cursor.close()
