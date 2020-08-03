@@ -5,6 +5,7 @@ OTP_BLOCK_TIME=3600
 
 responses= {
      'invalid_login' :{'status':400, 'message':'Invalid login_id'},
+     'login_required' : {'status':401 ,'message' : 'Please login first'},
      'verify_response' : {'status':200, 'message':'Successfully verified'},
      'invalid_product_id' : {'status':400, 'message':'No such product'},
      'added_to_wishlist' : {'status':200, 'message':'Added to wishlist'},
