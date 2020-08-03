@@ -16,7 +16,6 @@ def get_current_user(request):
     
 
 
-
 def check_if_otp_generated_for_more_than_limit_for_user(phone_no):
     try:
         cursor = cn.cursor()
