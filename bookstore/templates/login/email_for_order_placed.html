@@ -4,9 +4,9 @@
 {% for data in order_data_object  %}
     <p><strong>TITLE :</strong> <div style="color:red">{{data.title}}</div><p>
     <p><strong>AUTHOR :</strong> <div style="color:red">{{data.author}}</div><p>
-    <p><strong>IMAGE :</strong><div style="color:red"> {{data.image}}</div><p>
+    <p><strong>IMAGE :</strong><img src= {{data.image}}><p>
     <p><strong>QUANTITY :</strong> <div style="color:red">{{data.quantity}}</div><p>  
-    <p><strong>TOTAL :</strong> <div style="color:red">{{data.total}}</div><p>
+    <p><strong>TOTAL :</strong> <div style="color:red">{{total}}</div><p>
 {% endfor %}
 </body>
 </html>
