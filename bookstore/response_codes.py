@@ -29,7 +29,8 @@ responses= {
      'removed_cart_item' : {'status':200, 'message':'Removed from cart'},
      'database_error' : {"status":500, 'message':'Something went wrong'}, 
      'programming_error' : {"status":500, 'message':'Something went wrong'},
-     'integrity_error' : {"status":500, 'message':'Something went wrong'}
+     'integrity_error' : {"status":500, 'message':'Something went wrong'},
+     'too_many_otp' : {'status' : 400 , 'message': 'You have tried too many times. Please come back again tommorow'},
 
     }
 

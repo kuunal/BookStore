@@ -1,15 +1,12 @@
 from django.db import models, connection
-
+from bookstore.utility import DataBaseOperations as db
 # Create your models here.
 
 class LoginManager:
 
     @staticmethod
     def get(user_id):
-        try:
-            cursor = connection.cursor()
-            cursor.execute('Select email from users where id = %s', (user_id,))
-            user_email = cursor.fetchall()[0]
-            return user_email
-        finally :
-            cursor.close()
+        cursor = connection.cursor()
+        user_email = db.execute_sql('Select email from users where id = %s', (user_id,), False)
+        return user_email
+

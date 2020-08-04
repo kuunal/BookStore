@@ -14,7 +14,8 @@ class DataBaseOperations:
             cursor = connection.cursor()
             cursor.execute(query, params)
             if many == True:
-                return cursor.fetchall()
+                result = cursor.fetchall()
+                return result if result else None
             if many == False:
                 result = cursor.fetchone()
                 return result[0] if result else None
