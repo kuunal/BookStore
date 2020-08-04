@@ -7,6 +7,6 @@ class LoginManager:
     @staticmethod
     def get(user_id):
         cursor = connection.cursor()
-        user_email = db.execute_sql('Select email from users where id = %s', (user_id,), False)
+        user_email = db.execute_sql('Select email from users where id = %s', (user_id,), True)[0]
         return user_email
 
