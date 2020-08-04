@@ -39,10 +39,13 @@ class CartView(APIView):
         return Response(get_response_code('removed_cart_item'))
 
     @login_required
-    def post(self, request):
-        user_id =2
+    def post(self, request, id=None):
+        user_id = get_current_user(request)
         address = request.data['address']
-        result = CartModel.objects.all(user_id)
+        if id:
+            result = CartModel.objects.get(id,user_id)
+        else:
+            result = CartModel.objects.all(user_id)
         total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
         id = get_latest_order_id()
         OrderManager.insert(result, total, address, id)

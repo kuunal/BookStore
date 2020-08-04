@@ -7,7 +7,7 @@ from bookstore.redis_setup import get_redis_instance
 from .default_jwt import jwt_decode
 from response_codes import get_response_code
 from rest_framework import authentication, exceptions
-from bookstore.book_store_exception import LoginRequiredError
+from bookstore.book_store_exception import BookStoreError
 
 
 def get_current_user(request):
@@ -17,14 +17,16 @@ def get_current_user(request):
     for key in redis_instance.scan_iter():
         if key.decode('utf-8') == str(user_id):   
             return user_id
-    
+    return None
+
+
 def login_required(func):
-    def wrapper(request, *args, **kwargs):
-        try:
-            get_current_user(request)
-            return func(request, *args, **kwargs)
-        except exceptions.AuthenticationFailed:
-            raise LoginRequiredError(get_response_code('login_required'))
+    def wrapper(obj=None, request=None, id=None):
+        if request==None:
+            get_current_user(obj)
+            return func(obj)
+        get_current_user(request)
+        return func(obj, request, id)
     return wrapper
 
 def check_if_otp_generated_for_more_than_limit_for_user(phone_no):

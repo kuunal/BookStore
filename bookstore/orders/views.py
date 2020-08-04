@@ -11,7 +11,6 @@ from login.services import login_required
 
 # Create your views here.
 class OrderView(APIView):
-    @login_required
     def get(self, request):
         user_id = get_current_user(request)
         orders = OrderModel.objects.filter(user_id)
@@ -20,11 +19,9 @@ class OrderView(APIView):
         return Response({'order':serializer.data, 'total':total})
         
         
-    @login_required
     def post(self, request):
         user_id = get_current_user(request)
         serializer = OrderSerializer(data=request.data)
-        total = 0
         if serializer.is_valid():
             serializer.save(user_id=user_id)
             return Response(get_response_code('order_placed'))

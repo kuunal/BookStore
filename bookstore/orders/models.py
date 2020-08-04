@@ -3,6 +3,7 @@ from wishlist.models import WishListsManager
 from django.core.exceptions import ValidationError
 from .services import get_latest_order_id
 from login.tasks import order_placed_mail_to_user
+from bookstore.book_store_exception import BookStoreError
 
 class OrderManager:
     
@@ -50,14 +51,16 @@ class OrderManager:
                     address = orders.address
                     total = orders.quantity * price 
                 if  available_quantity == 0 :
-                    raise ValidationError("Product out of stock") 
+                    raise BookStoreError(get_response_code('not_available')) 
                 if available_quantity < orders.quantity:
-                    raise ValidationError("Product out of stock for that quantity") 
+                    raise BookStoreError(get_response_code('out_of_stock')) 
                 
                 query = 'insert into orders(user_id, product_id, quantity, address, order_id) values(%s, %s, %s, %s, %s)'
 
                 result =  cursor.execute(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
                 if result:
+                    if len(obj) > 1:
+                        cursor.execute('delete from cart where product_id = %s and user_id=%s', (orders.product_id, orders.user_id))
                     cursor.execute('update product set quantity = quantity-%s where id = %s', (orders.quantity, orders.product_id))
                 product_info = {
                     'title':title,
