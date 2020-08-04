@@ -5,8 +5,8 @@ from bookstore.utility import DataBaseOperations as db
 class ProductManager():
 
     @staticmethod
-    def all(query="select * from product"):
-        rows = db.execute_sql(query, None, True)
+    def all(query="select * from product", params=None):
+        rows = db.execute_sql(query, params, True)
         objects = []
         for row in rows:
             product_object = Product()
@@ -24,11 +24,13 @@ class ProductManager():
     @staticmethod
     def get(id):
         if id.isnumeric():
-            query = f'select * from product where id = {id}';
+            query = f'select * from product where id = %s'
+            params = (id,)
         else:
             id = id+"%"
-            query = f'select * from product where LOWER(title) like "{id}" or LOWER(author) LIKE "{id}"';
-        return ProductManager.all(query)
+            query = 'select * from product where LOWER(title) like "%s" or LOWER(author) LIKE "%s"';
+            params = (id,id)
+        return ProductManager.all(query, params)
         
     @staticmethod
     def filter(objects):

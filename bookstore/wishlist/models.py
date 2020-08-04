@@ -2,6 +2,8 @@ from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 from django.db import models, connection
 from response_codes import get_response_code
+from bookstore.utility import DataBaseOperations as db
+
 
 class WishListsManager:
     
@@ -13,45 +15,33 @@ class WishListsManager:
         return WishListsManager.all(query, params, model)[0]
 
     @staticmethod
-    def insert(obj, query='insert into wishlists(user_id, product_id) values(%s, %s)',  params=None):
-        try:
-            cursor = connection.cursor()
-            if params == None:
-                params = (obj.user_id, obj.product_id)
-            result = cursor.execute(query, params)
-            return get_response_code('added_to_wishlist')
-        finally:
-            cursor.close()
-    
+    def insert(obj):
+        query = 'insert into wishlists(user_id, product_id) values(%s,%s)'
+        params = (obj.user_id, obj.product_id)
+        db.execute_sql(query, params)
+        return get_response_code('added_to_wishlist')
+
     @staticmethod
     def delete(id, user_id, query='delete from wishlists where product_id=%s and user_id=%s'):
-        try:
-            cursor = connection.cursor()
-            result = cursor.execute( query,(id, user_id))
-            return result
-        finally:
-            cursor.close()
+        db.execute_sql( query,(id, user_id))
+        return 1
+    
 
     @staticmethod
     def all(query=None,params=None, model=None):
-        try:
-            cursor = connection.cursor()
-            objects = []
-            if query == None:
-                query = 'select * from wishlists where user_id = %s' 
-                params = (params,)
-                model = WishListModel
-            cursor.execute(query, params)
-            wishlists = cursor.fetchall()
-            for row in wishlists:
-                wishlist_object = model()
-                wishlist_object.user_id = row[1]
-                wishlist_object.product_id = row[2]
-                objects.append(wishlist_object)
-            return objects
-        finally:
-            cursor.close()
-
+        objects = []
+        if query == None:
+            query = 'select * from wishlists where user_id = %s' 
+            params = (params,)
+            model = WishListModel
+        wishlists = db.execute_sql(query, params, True)
+        for row in wishlists:
+            wishlist_object = model()
+            wishlist_object.user_id = row[1]
+            wishlist_object.product_id = row[2]
+            objects.append(wishlist_object)
+        return objects
+        
 
 class WishListModel:
     objects = WishListsManager()

@@ -10,6 +10,7 @@ from .serializer import ProductSerializer
 from response_codes import get_response_code
 from django.db import connection, IntegrityError
 from login.services import login_required
+from bookstore.utility import DataBaseOperations as db
 
 class WishListView(APIView):
 
@@ -45,16 +46,11 @@ def add_to_wishlist(request):
         return Response(get_response_code('invalid_product'))
     user_id  = get_current_user(request)
     try:
-        cursor = connection.cursor()
-        cursor.execute('select count(*) from wishlists where product_id = %s and user_id = %s', (product_id, user_id) )
-        count = cursor.fetchone()
-        count = count[0]
+        count = db.execute_sql('select count(*) from wishlists where product_id = %s and user_id = %s', (product_id, user_id), False)
         if count > 0:
             return Response(get_response_code('product_already_in_wishlist'))
         wishlist = WishListModel(user_id=user_id, product_id=product_id)
         wishlist.save()
     except IntegrityError:
         return Response(get_response_code('invalid_product_id'))
-    finally:
-        cursor.close()
     return Response(get_response_code('added_to_wishlist'))
