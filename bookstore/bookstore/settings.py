@@ -57,6 +57,10 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'products',
+    'wishlist',
+    'orders',
+    'cart',
+    'login',
     'rest_framework',
     'django_filters',
     'django.contrib.admin',
