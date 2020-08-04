@@ -52,6 +52,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema' }
 
 # Application definition
 
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     'orders',
     'cart',
     'login',
+    'drf_yasg',
     'rest_framework',
     'django_filters',
     'django.contrib.admin',
@@ -159,3 +161,4 @@ STATIC_URL = '/static/'
 CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
 
 # CELERY_CACHE_BACKEND = 'django-cache'
+
