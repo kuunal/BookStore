@@ -20,13 +20,16 @@ responses= {
      'login_failed' : {'status': 401, 'message':'invalid Id or pass'},
      'product_already_in_wishlist' : {'status': 400, 'message':'Product already in wishlist'},
      'wishlist_delete_does_exists':{'status':400, 'message':'No such item in wishlist'},
-     'added_to_wishlist' : {'status':200, 'message':'Added to cart'},
+     'added_to_cart' : {'status':200, 'message':'Added to cart'},
      'updated_quantity': {'status':200, 'message':'Updated quantity successfully'},
      'out_of_stock' : {'status':400, 'message':'Product out of stock for that quantity'},
      'order_placed' : {'status' : 200, 'message' : 'Order Placed'},
      'not_available' : {'status' : 400, 'message' : 'Product not available'},
      'item_not_in_cart':{'status':400, 'message':'No such item in cart'},
      'removed_cart_item' : {'status':200, 'message':'Removed from cart'},
+     'database_error' : {"status":500, 'message':'Something went wrong'}, 
+     'programming_error' : {"status":500, 'message':'Something went wrong'},
+     'integrity_error' : {"status":500, 'message':'Something went wrong'}
 
     }
 

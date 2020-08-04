@@ -7,7 +7,6 @@ from bookstore.book_store_exception import BookStoreError
 from response_codes import get_response_code
 
 def jwt_decode(token):
-    print(settings.JWT_SECRET_KEY)
     if not token:
         raise BookStoreError(get_response_code('login_required'))  
     try:
