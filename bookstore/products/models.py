@@ -28,7 +28,7 @@ class ProductManager():
             params = (id,)
         else:
             id = id+"%"
-            query = 'select * from product where LOWER(title) like "%s" or LOWER(author) LIKE "%s"';
+            query = 'select * from product where LOWER(title) like %s or LOWER(author) LIKE %s';
             params = (id,id)
         return ProductManager.all(query, params)
         
