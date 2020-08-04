@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from .serializer import ProductSerializer
 from response_codes import get_response_code
 from django.db import connection, IntegrityError
+from login.services import login_required
 
 class WishListView(APIView):
 
@@ -22,7 +23,7 @@ class WishListView(APIView):
             except IndexError:
                 return Response(get_response_code('invalid_product_id'))
         else:
-            wishlist = WishListdModel.objects.all(params=user_id)
+            wishlist = WishListModel.objects.all(params=user_id)
             products = Product.objects.filter(wishlist)
         serializer = ProductSerializer(products, many = True)
         return Response(serializer.data)
