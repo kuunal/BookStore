@@ -162,3 +162,28 @@ CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABAS
 
 # CELERY_CACHE_BACKEND = 'django-cache'
 
+
+LOGGING = {
+    'version':1,
+    'disable_existing_loggers': False,
+    'loggers':{
+        'django.request' : {
+            'handlers':['default_handler',],
+            'level' : 'INFO',
+        }
+    },
+    'handlers':{
+        'default_handler':{
+            'level':'INFO',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'), 
+            'formatter':'default_formatter',
+        }
+    },
+    'formatters':{
+        'default_formatter':{
+            'format': '{levelname} {asctime} {module} {message}',
+            'style':'{'
+        }
+    }
+}
