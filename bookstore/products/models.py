@@ -1,15 +1,14 @@
 from django.db import models
 from django.db import connection 
-    
+from bookstore.utility import DataBaseOperations as db 
 
 class ProductManager():
 
     @staticmethod
     def all(query="select * from product"):
-        cursor = connection.cursor()
-        cursor.execute(query)
+        rows = db.execute_sql(query, None, True)
         objects = []
-        for row in cursor.fetchall():
+        for row in rows:
             product_object = Product()
             product_object.id = row[0]
             product_object.author = row[6]
