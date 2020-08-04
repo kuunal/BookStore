@@ -33,8 +33,6 @@ class ProductManager():
         
     @staticmethod
     def filter(objects):
-        # if len(objects)==0:
-        #     return None
         result = []
         for obj in objects:
             result.extend(ProductManager.get(str(obj.product_id))) 
