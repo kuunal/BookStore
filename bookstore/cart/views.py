@@ -26,7 +26,7 @@ class CartView(APIView):
                 return Response(get_response_code('invalid_product_id'))
         else:
             result = CartModel.objects.all(user_id)
-        total = sum([total.price if total.quantity_in_cart == 1 else total.price*total.quantity_in_cart for total in result])
+        total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
         serializer = CartSerializer(result, many = True)
         return Response({'cart':serializer.data, 'total':total})
 
@@ -35,8 +35,8 @@ class CartView(APIView):
         user_id = get_current_user(request)
         result = CartModel.objects.delete(id, user_id)
         if result == 0:
-            return Response(get_response_code('wishlist_delete_does_exists'))
-        return Response(get_response_code('deleted_wishlist_item'))
+            return Response(get_response_code('item_not_in_cart'))
+        return Response(get_response_code('removed_cart_item'))
 
     @login_required
     def post(self, request):

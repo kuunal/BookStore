@@ -11,7 +11,7 @@ class CartManager:
         try:
             cursor = connection.cursor()
             if not query:
-                query = 'select p.*, c.quantity, c.user_id as quantity_in_cart from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
+                query = 'select p.*, c.quantity, c.user_id from cart c inner join product p on c.product_id = p.id where c.user_id = %s'
                 params = (user_id,)
             cursor.execute(query, params)
             result = cursor.fetchall()
@@ -36,7 +36,7 @@ class CartManager:
 
     @staticmethod
     def get(id, user_id):
-        query = 'select p.*, c.quantity from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
+        query = 'select p.*, c.quantity, c.user_id from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
         params = (user_id, id)
         return CartManager.all(query=query,params=params)
 
@@ -54,7 +54,7 @@ class CartManager:
                     result = cursor.execute('update cart set quantity = %s where  product_id = %s and user_id = %s', (int(obj.quantity), obj.product_id, obj.user_id))
                     return get_response_code('updated_quantity')
                 else:
-                    raise ValidationError("Product out of stock for that quantity")
+                    raise BookStoreError("out_of_stock")
             query = 'insert into cart(user_id, product_id, quantity) values(%s, %s, %s)'
                     
             return WishListsManager.insert(obj, query, (obj.user_id, obj.product_id, obj.quantity))
