@@ -31,7 +31,7 @@ class CartView(APIView):
         return Response({'cart':serializer.data, 'total':total})
 
     @login_required
-    def delete(self, request, id):
+    def delete(self, request, id=None):
         user_id = get_current_user(request)
         result = CartModel.objects.delete(id, user_id)
         if result == 0:

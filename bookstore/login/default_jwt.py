@@ -19,6 +19,7 @@ def jwt_decode(token):
         raise BookStoreError(get_response_code('jwt_signature_expired'))   
 
 def jwt_encode(user_id):
+    print(timezone.now() + timedelta(seconds=settings.JWT_EXPIRATION_TIME))
     return jwt.encode({'user_id':user_id,
                     'exp': timezone.now() + timedelta(seconds=settings.JWT_EXPIRATION_TIME),
                     },settings.JWT_SECRET_KEY)
