@@ -20,13 +20,13 @@ class ProductView(APIView):
         else:
             products = Product.objects.all()
             try:
-                sort_by = id if not request.GET.get('sortby') else request.GET.get('sortby').lower()
+                sort_by = 'id' if not request.GET.get('sortby') else request.GET.get('sortby').lower()
                 sort_type = True if request.GET.get('des') == 'true' else False
                 products.sort(key= lambda obj: getattr(obj, sort_by), reverse=sort_type)    
             except AttributeError:
                 sort_by = 'author'
-            paginator_object = Paginator(products,PAGINATOR_PAGE_LIMIT)
-            page_no = 1 if request.GET.get('pageno') == None else request.GET.get('pageno')
+        paginator_object = Paginator(products,PAGINATOR_PAGE_LIMIT)
+        page_no = 1 if request.GET.get('pageno') == None else request.GET.get('pageno')
         try:
             product_obj = paginator_object.page(page_no)
         except EmptyPage:

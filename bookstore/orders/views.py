@@ -8,6 +8,7 @@ from .models import OrderModel
 from login.tasks import order_placed_mail_to_user
 from bookstore import settings
 from login.services import login_required
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 class OrderView(APIView):
@@ -18,7 +19,7 @@ class OrderView(APIView):
         total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in orders])
         return Response({'order':serializer.data, 'total':total})
         
-        
+    @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
         user_id = get_current_user(request)
         serializer = OrderSerializer(data=request.data)
