@@ -35,11 +35,12 @@ class WishListsManager:
             params = (params,)
             model = WishListModel
         wishlists = db.execute_sql(query, params, True)
-        for row in wishlists:
-            wishlist_object = model()
-            wishlist_object.user_id = row[1]
-            wishlist_object.product_id = row[2]
-            objects.append(wishlist_object)
+        if wishlists:
+            for row in wishlists:
+                wishlist_object = model()
+                wishlist_object.user_id = row[1]
+                wishlist_object.product_id = row[2]
+                objects.append(wishlist_object)
         return objects
         
 

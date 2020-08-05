@@ -11,6 +11,7 @@ from response_codes import get_response_code
 from django.db import connection, IntegrityError
 from login.services import login_required
 from bookstore.utility import DataBaseOperations as db
+from bookstore.book_store_exception import BookStoreError
 
 class WishListView(APIView):
 
@@ -22,7 +23,7 @@ class WishListView(APIView):
                 wishlist = WishListModel.objects.get(id, user_id)
                 products = Product.objects.get(str(wishlist.product_id))
             except IndexError:
-                return Response(get_response_code('invalid_product_id'))
+                raise BookStoreError(get_response_code('invalid_product_id'))
         else:
             wishlist = WishListModel.objects.all(params=user_id)
             products = Product.objects.filter(wishlist)
@@ -52,5 +53,5 @@ def add_to_wishlist(request):
         wishlist = WishListModel(user_id=user_id, product_id=product_id)
         wishlist.save()
     except IntegrityError:
-        return Response(get_response_code('invalid_product_id'))
+        raise BookStoreError(get_response_code('invalid_product_id'))
     return Response(get_response_code('added_to_wishlist'))
