@@ -165,15 +165,15 @@ LOGGING = {
     'version':1,
     'disable_existing_loggers': False,
     'loggers':{
-        'django.request' : {
+        'django' : {
             'handlers':['default_handler',],
             'level' : 'DEBUG',
         }
     },
     'handlers':{
         'default_handler':{
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
+            'level':'INFO',
+            'class':'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'debug.log'), 
             'formatter':'default_formatter',
         }
@@ -181,7 +181,7 @@ LOGGING = {
     'formatters':{
         'default_formatter':{
             'format': '{levelname} {asctime} {module} {message}',
-            'style':'{'
+            'style':'{' 
         }
     }
 }
@@ -192,7 +192,11 @@ SWAGGER_SETTINGS = {
         'api_key': {
             'type': 'apiKey',
             'in': 'header',
-            'name': 'x_token'
+            'name': 'x-token'
+        },'api_key1': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'x-phoneno'
         }
     },
 }
