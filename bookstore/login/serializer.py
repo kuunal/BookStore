@@ -14,3 +14,6 @@ class LoginSerializer(serializers.Serializer):
         if re.match("^[a-zA-Z0-9]+[\\.\\-\\+\\_]?[a-zA-Z0-9]+@[a-zA-Z0-9]+[.]?[a-zA-Z]{2,4}[\\.]?([a-z]{2,4})?$", value) or re.match("[0-9]{10}", value):
             return value
         raise BookStoreError(get_response_code('invalid_login'))
+
+class OTPSerializer(serializers.Serializer):
+    otp = serializers.CharField(min_length=6, max_length=6)

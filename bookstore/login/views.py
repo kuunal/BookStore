@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.db import connection as conn
-from .serializer import LoginSerializer
+from .serializer import LoginSerializer, OTPSerializer
 from rest_framework.response import Response
 from .otp import send_otp, gen_otp
 from .tasks import send_otp_to_user_while_login
@@ -19,12 +19,15 @@ from .default_jwt import jwt_encode
 from bookstore.utility import DataBaseOperations as db
 from login.services import get_current_user
 from redis import DataError
-from bookstore.book_store_exception import BookStoreError 
+from bookstore.book_store_exception import BookStoreError
+from drf_yasg.utils import swagger_auto_schema
+
 # Create your views here.
 
 class LoginView(APIView):   
     serializer_class = LoginSerializer
 
+    @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
         login_id = request.data['login_id']
         password = request.data['password']
@@ -51,15 +54,20 @@ class LoginView(APIView):
 
 
 class VerifyOTPView(APIView):
+
+    @swagger_auto_schema(request_body=OTPSerializer)
     def post(self, request):
         phone_no = request.headers.get('x_phoneno')
         otp = request.data['otp']
         redis_instance  = get_redis_instance()
+        if not phone_no:
+            raise BookStoreError(get_response_code('no_headers'))
         try:
             cursor = conn.cursor()
             original_otps = db.execute_sql('select otp, datetime from otp_history where phone_no = %s', [phone_no], True)
 
             if len(otp)>0:
+                print(original_otps)
                 latest_otp = original_otps[len(original_otps)-1][0]
                 latest_otp_send_time  = original_otps[len(original_otps)-1][1]  
                 elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()
@@ -77,7 +85,7 @@ class VerifyOTPView(APIView):
                 return Response(get_response_code('otp_not_generated'))
         finally:
             cursor.close()
-        
+
 @api_view(('GET',))
 def logout(request):
     user_id = get_current_user(request)
