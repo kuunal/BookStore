@@ -25,12 +25,12 @@ class ProductView(APIView):
                 products.sort(key= lambda obj: getattr(obj, sort_by), reverse=sort_type)    
             except AttributeError:
                 sort_by = 'author'
-            p = Paginator(products,PAGINATOR_PAGE_LIMIT)
+            paginator_object = Paginator(products,PAGINATOR_PAGE_LIMIT)
             page_no = 1 if request.GET.get('pageno') == None else request.GET.get('pageno')
         try:
-            p = p.page(page_no)
+            product_obj = paginator_object.page(page_no)
         except EmptyPage:
-            p = p.page(1)
-        serializer = prod_serializer(p, many=True)
+            product_obj = paginator_object.page(1)
+        serializer = prod_serializer(product_obj, many=True)
         response = serializer.data
         return Response(response) if response else Response (get_response_code('invalid_product_id'))
