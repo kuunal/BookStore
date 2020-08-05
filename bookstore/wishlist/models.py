@@ -23,8 +23,8 @@ class WishListsManager:
 
     @staticmethod
     def delete(id, user_id, query='delete from wishlists where product_id=%s and user_id=%s'):
-        db.execute_sql( query,(id, user_id))
-        return 1
+        return db.execute_sql( query,(id, user_id))
+        
     
 
     @staticmethod
