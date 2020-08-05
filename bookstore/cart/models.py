@@ -14,19 +14,20 @@ class CartManager:
             params = (user_id,)
         result = db.execute_sql( query, params, many=True)
         objects = []
-        for row in result:
-            obj = CartModel()
-            obj.product_id = row[0]
-            obj.title = row[1]
-            obj.image = row[2]
-            obj.quantity = row[7]
-            obj.price = row[4]
-            obj.description = row[5]
-            obj.author = row[6]
-            obj.quantity_in_cart = row[7]
-            obj.user_id = row[8]
+        if result:
+            for row in result:
+                obj = CartModel()
+                obj.product_id = row[0]
+                obj.title = row[1]
+                obj.image = row[2]
+                obj.quantity = row[7]
+                obj.price = row[4]
+                obj.description = row[5]
+                obj.author = row[6]
+                obj.quantity_in_cart = row[7]
+                obj.user_id = row[8]
 
-            objects.append(obj)
+                objects.append(obj)
         return objects
         
 

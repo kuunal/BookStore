@@ -13,6 +13,7 @@ from .serializers import CartSerializer
 from orders.services import get_latest_order_id
 from orders.models import OrderManager
 from login.services import login_required
+from bookstore.book_store_exception import BookStoreError
 
 class CartView(APIView):
     
@@ -57,14 +58,14 @@ def add_to_cart(request):
     product_id = request.GET.get('id')
     quantity = 1 if request.GET.get('quantity') == None else request.GET.get('quantity')
     if not product_id.isnumeric() and not quantity.isnumeric() and product_id !=0 and quantity!=0:
-        return Response(get_response_code('invalid_product'))
+        raise BookStoreError(get_response_code('invalid_product'))
     user_id  = get_current_user(request)
     try:
         cart_item = CartModel(user_id=user_id, product_id=product_id, quantity=quantity)
         result = cart_item.save()
         return Response(result)
     except ValidationError:
-        return Response(get_response_code('out_of_stock'))
+        raise BookStoreError(get_response_code('out_of_stock'))
     except IntegrityError:
-        return Response(get_response_code('invalid_product_id'))
+        raise BookStoreError(get_response_code('invalid_product_id'))
     return Response(get_response_code('added_to_wishlist'))
