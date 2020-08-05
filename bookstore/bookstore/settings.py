@@ -167,12 +167,12 @@ LOGGING = {
     'loggers':{
         'django.request' : {
             'handlers':['default_handler',],
-            'level' : 'INFO',
+            'level' : 'DEBUG',
         }
     },
     'handlers':{
         'default_handler':{
-            'level':'INFO',
+            'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'debug.log'), 
             'formatter':'default_formatter',
