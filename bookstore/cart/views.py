@@ -51,24 +51,20 @@ class CartView(APIView):
         else:
             result = CartModel.objects.all(user_id)
         total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
+        if len(result)==0:
+            raise BookStoreError(get_response_code('item_not_in_cart'))
         id = get_latest_order_id()
         OrderManager.insert(result, total, address, id)
-        return Response(200)
+        return Response(get_response_code('order_placed'))
 
 @api_view(('GET',))
 @login_required
 def add_to_cart(request):
     product_id = request.GET.get('id')
-    quantity = 1 if request.GET.get('quantity') == None else request.GET.get('quantity')
-    if not product_id.isnumeric() and not quantity.isnumeric() and product_id !=0 and quantity!=0:
+    quantity = '1' if request.GET.get('quantity') == None else request.GET.get('quantity')
+    if not product_id.isnumeric() or not quantity.isnumeric() or product_id ==0 and quantity ==0:
         raise BookStoreError(get_response_code('invalid_product'))
     user_id  = get_current_user(request)
-    try:
-        cart_item = CartModel(user_id=user_id, product_id=product_id, quantity=quantity)
-        result = cart_item.save()
-        return Response(result)
-    except ValidationError:
-        raise BookStoreError(get_response_code('out_of_stock'))
-    except IntegrityError:
-        raise BookStoreError(get_response_code('invalid_product_id'))
+    cart_item = CartModel(user_id=user_id, product_id=product_id, quantity=quantity)
+    cart_item.save()
     return Response(get_response_code('added_to_wishlist'))

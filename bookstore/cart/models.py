@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from response_codes import get_response_code
 from products.models import Product
 from bookstore.utility import DataBaseOperations as db
-
+from bookstore.book_store_exception import BookStoreError
 class CartManager:
 
     @staticmethod
@@ -39,19 +39,17 @@ class CartManager:
 
     @staticmethod
     def insert(obj):
-        
-        count = db.execute_sql('select quantity from cart where product_id = %s and user_id = %s', (obj.product_id, obj.user_id), False)
-        if count:
-            total_quantity = db.execute_sql('select quantity from product where id = %s', (obj.product_id,), False)
-            if total_quantity >= int(obj.quantity):
+        total_quantity = db.execute_sql('select quantity from product where id = %s', (obj.product_id,), False)
+        if total_quantity >= int(obj.quantity):
+            count = db.execute_sql('select quantity from cart where product_id = %s and user_id = %s', (obj.product_id, obj.user_id), False)
+            if count:
                 result = db.execute_sql('update cart set quantity = %s where  product_id = %s and user_id = %s', (int(obj.quantity), obj.product_id, obj.user_id))
                 return get_response_code('updated_quantity')
-            else:
-                raise BookStoreError("out_of_stock")
-        query = 'insert into cart(user_id, product_id, quantity) values(%s, %s, %s)'
-                
-        db.execute_sql(query, (obj.user_id, obj.product_id, obj.quantity))
-        return get_response_code('added_to_cart')
+            query = 'insert into cart(user_id, product_id, quantity) values(%s, %s, %s)'
+            db.execute_sql(query, (obj.user_id, obj.product_id, obj.quantity))
+            return get_response_code('added_to_cart')
+        else:
+            raise BookStoreError(get_response_code("out_of_stock"))
         
 
     @staticmethod
@@ -59,6 +57,7 @@ class CartManager:
         query = 'delete from cart where product_id = %s and user_id = %s'
         params = (id, user_id,)
         return db.execute_sql(query, params)
+
 
     @staticmethod
     def update(id):
