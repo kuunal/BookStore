@@ -5,6 +5,7 @@ OTP_BLOCK_TIME=3600
 PAGINATOR_PAGE_LIMIT = 5
 
 responses= {
+     'no_headers' : {'status' : 401, 'message' : 'No headers found'},
      'invalid_login' :{'status':400, 'message':'Invalid login_id'},
      'login_required' : {'status':401 ,'message' : 'Please login first'},
      'jwt_auth_error' : {'status' : 401, 'message' : 'Invalid Token'},
