@@ -17,7 +17,13 @@ class ProductView(APIView):
             pk = pk.lower()
             products = Product.objects.get(pk)
         else:
+            sort_by = id if not request.GET.get('sortby') else request.GET.get('sortby')
+            sort_type = True if request.GET.get('des') == 'true' else False
             products = Product.objects.all()
+            try:
+                products.sort(key= lambda obj: getattr(obj, sort_by), reverse=sort_type)    
+            except AttributeError:
+                sort_by = 'author'
         serializer = prod_serializer(products, many=True)
         response = serializer.data
         return Response(response) if response else Response (get_response_code('invalid_product_id'))
