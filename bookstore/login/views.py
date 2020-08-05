@@ -1,6 +1,7 @@
 import jwt
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from django.db import connection as conn
 from .serializer import LoginSerializer
 from rest_framework.response import Response
@@ -16,7 +17,9 @@ from bookstore import settings
 from response_codes import get_response_code
 from .default_jwt import jwt_encode
 from bookstore.utility import DataBaseOperations as db
-
+from login.services import get_current_user
+from redis import DataError
+from bookstore.book_store_exception import BookStoreError 
 # Create your views here.
 
 class LoginView(APIView):   
@@ -75,3 +78,12 @@ class VerifyOTPView(APIView):
         finally:
             cursor.close()
         
+@api_view(('GET',))
+def logout(request):
+    user_id = get_current_user(request)
+    redis_instance = get_redis_instance()
+    try:
+        redis_instance.delete(user_id)
+    except DataError:
+        raise BookStoreError(get_response_code('login_required'))
+    return Response(get_response_code('logout'))
