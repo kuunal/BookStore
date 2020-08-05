@@ -9,3 +9,7 @@ class CartSerializer(serializers.Serializer):
     quantity = serializers.CharField(max_length=255)
     price = serializers.CharField()
     description = serializers.CharField(max_length=255)
+
+
+class CartOrderSerializer(serializers.Serializer):
+    address = serializers.CharField(max_length=255)

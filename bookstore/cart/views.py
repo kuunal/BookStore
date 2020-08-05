@@ -9,11 +9,13 @@ from login.services import get_current_user
 from .models import CartModel
 from response_codes import get_response_code
 from django.core.exceptions import ValidationError
-from .serializers import CartSerializer
+from .serializers import CartSerializer, CartOrderSerializer
 from orders.services import get_latest_order_id
 from orders.models import OrderManager
 from login.services import login_required
 from bookstore.book_store_exception import BookStoreError
+from drf_yasg.utils import swagger_auto_schema
+
 
 class CartView(APIView):
     
@@ -39,6 +41,7 @@ class CartView(APIView):
             return Response(get_response_code('item_not_in_cart'))
         return Response(get_response_code('removed_cart_item'))
 
+    @swagger_auto_schema(request_body=CartOrderSerializer)
     @login_required
     def post(self, request, id=None):
         user_id = get_current_user(request)
