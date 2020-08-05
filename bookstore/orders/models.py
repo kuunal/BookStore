@@ -5,6 +5,7 @@ from .services import get_latest_order_id
 from login.tasks import order_placed_mail_to_user
 from bookstore.book_store_exception import BookStoreError
 from bookstore.utility import DataBaseOperations as db
+from response_codes import get_response_code
 
 class OrderManager:
     
@@ -51,10 +52,6 @@ class OrderManager:
             query = 'insert into orders(user_id, product_id, quantity, address, order_id) values(%s, %s, %s, %s, %s)'
 
             result =  db.execute_sql(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
-            if result:
-                if len(obj) > 1:
-                    db.execute_sql('delete from cart where product_id = %s and user_id=%s', (orders.product_id, orders.user_id))
-                db.execute_sql('update product set quantity = quantity-%s where id = %s', (orders.quantity, orders.product_id))
             product_info = {
                 'title':title,
                 'image': image,
