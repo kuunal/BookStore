@@ -12,13 +12,14 @@ class DataBaseOperations:
     def execute_sql(query=None,  params=None, many=None):
         try:
             cursor = connection.cursor()
-            cursor.execute(query, params)
+            res = cursor.execute(query, params)
             if many == True:
                 result = cursor.fetchall()
                 return result if result else None
             if many == False:
                 result = cursor.fetchone()
                 return result[0] if result else None
+            return res
         except DatabaseError:
             raise BookStoreError(get_response_code('database_error'))
         except ProgrammingError:
