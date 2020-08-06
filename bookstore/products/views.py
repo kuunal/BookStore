@@ -8,11 +8,19 @@ from .serializer import ProductSerializer as prod_serializer
 from .models import Product
 from response_codes import get_response_code, PAGINATOR_PAGE_LIMIT
 from django.core.paginator import Paginator, EmptyPage
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-# Create your views here.
+
+page_param = openapi.Parameter('pageno', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_INTEGER)
+sortby_param = openapi.Parameter('sortby', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+desc_param = openapi.Parameter('des', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+
+
 class ProductView(APIView):
 
-
+    @swagger_auto_schema(manual_parameters=[page_param, sortby_param, desc_param], )
     def get(self, request, pk=None):
         if pk:
             pk = pk.lower()
