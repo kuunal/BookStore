@@ -15,6 +15,7 @@ from orders.models import OrderManager
 from login.services import login_required
 from bookstore.book_store_exception import BookStoreError
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class CartView(APIView):
@@ -57,6 +58,11 @@ class CartView(APIView):
         OrderManager.insert(result, total, address, id)
         return Response(get_response_code('order_placed'))
 
+
+product_id = openapi.Parameter('id',openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=True) 
+quantity = openapi.Parameter('quantity', openapi.IN_QUERY, required=True,type=openapi.TYPE_INTEGER) 
+
+@swagger_auto_schema(method='get' ,manual_parameters=[product_id, quantity],)
 @api_view(('GET',))
 @login_required
 def add_to_cart(request):
