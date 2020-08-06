@@ -12,6 +12,8 @@ from django.db import connection, IntegrityError
 from login.services import login_required
 from bookstore.utility import DataBaseOperations as db
 from bookstore.book_store_exception import BookStoreError
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class WishListView(APIView):
 
@@ -38,7 +40,9 @@ class WishListView(APIView):
             return Response(get_response_code('wishlist_delete_does_exists'))
         return Response(get_response_code('deleted_wishlist_item'))
 
+product_id = openapi.Parameter('id',openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=True) 
 
+@swagger_auto_schema(method='get' ,manual_parameters=[product_id,],)
 @api_view(('GET',))
 @login_required
 def add_to_wishlist(request):
