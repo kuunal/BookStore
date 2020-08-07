@@ -1,3 +1,4 @@
+import pickle
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -11,7 +12,8 @@ from django.core.paginator import Paginator, EmptyPage
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from bookstore.redis_setup import get_redis_instance
+from .services import get_cache_item, set_cache
 
 page_param = openapi.Parameter('pageno', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_INTEGER)
 sortby_param = openapi.Parameter('sortby', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
@@ -26,7 +28,11 @@ class ProductView(APIView):
             pk = pk.lower()
             products = Product.objects.get(pk)
         else:
-            products = Product.objects.all()
+            redis_instance = get_redis_instance()
+            products = get_cache_item()
+            if not products:
+                products = Product.objects.all()
+                set_cache(products)
             try:
                 sort_by = 'id' if not request.GET.get('sortby') else request.GET.get('sortby').lower()
                 sort_type = True if request.GET.get('des') == 'true' else False
