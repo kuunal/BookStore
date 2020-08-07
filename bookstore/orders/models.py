@@ -16,19 +16,20 @@ class OrderManager:
         params = (user_id,)
         records = db.execute_sql(query, params, True)
         objects = []
-        for row in records:
-            order_object = OrderModel()
-            order_object.id = row[0]
-            order_object.title = row[1]
-            order_object.image = row[2] 
-            order_object.price = row[4]
-            order_object.description=row[5]
-            order_object.author = row[6]
-            order_object.quantity = row[7]
-            order_object.address = row[8]
-            objects.append(order_object)
+        if records:
+            for row in records:
+                order_object = OrderModel()
+                order_object.id = row[0]
+                order_object.title = row[1]
+                order_object.image = row[2] 
+                order_object.price = row[4]
+                order_object.description=row[5]
+                order_object.author = row[6]
+                order_object.quantity = row[7]
+                order_object.address = row[8]
+                objects.append(order_object)
         return objects  
-    
+        
 
     @staticmethod
     def insert(obj, total=None, address=None, id = None):
