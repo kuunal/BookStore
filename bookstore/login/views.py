@@ -37,15 +37,14 @@ class LoginView(APIView):
                 cursor = conn.cursor()
                 phone_no = db.execute_sql("select phone_no from users where (email = %s or phone_no like %s) and password = %s ", (login_id, '%'+login_id, password), False)
                 if phone_no:
-                    try:
-                        check_if_otp_generated_for_more_than_limit_for_user(phone_no)
-                        check_if_user_is_blocked(phone_no)
-                    except ValidationError as e:
-                        return Response({'status':400,'message':str(e)})
+                    check_if_otp_generated_for_more_than_limit_for_user(phone_no)
+                    check_if_user_is_blocked(phone_no)
                     random_otp = gen_otp()
                     # send_otp_to_user_while_login.delay(phone_no, random_otp)  
                     db.execute_sql('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
-                    return Response(get_response_code('otp_sent'))
+                    response = get_response_code('otp_sent')
+                    response['Phone No.'] = phone_no
+                    return Response(response)
             except TypeError:
                 return Response(get_response_code('login_failed')) 
             finally:

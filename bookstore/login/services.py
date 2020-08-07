@@ -17,7 +17,7 @@ def get_current_user(request):
     for key in redis_instance.scan_iter():
         if key.decode('utf-8') == str(user_id):   
             return user_id
-    return None
+    raise BookStoreError(get_response_code('login_required'))
 
 
 def login_required(func):
