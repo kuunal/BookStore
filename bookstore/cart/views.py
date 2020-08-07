@@ -28,8 +28,6 @@ class CartView(APIView):
                 result = CartModel.objects.get(id, user_id)
             except IndexError:
                 return Response(get_response_code('invalid_product_id'))
-        else:
-            result = CartModel.objects.all(user_id)
         total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
         serializer = CartSerializer(result, many = True)
         return Response({'cart':serializer.data, 'total':total})
@@ -74,3 +72,14 @@ def add_to_cart(request):
     cart_item = CartModel(user_id=user_id, product_id=product_id, quantity=quantity)
     cart_item.save()
     return Response(get_response_code('added_to_wishlist'))
+
+@api_view(('GET',))
+@login_required
+def get_view(request):
+    user_id  = get_current_user(request)
+    result = CartModel.objects.all(user_id)
+    total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
+    serializer = CartSerializer(result, many = True)
+    return Response({'cart':serializer.data, 'total':total})
+
+
