@@ -59,3 +59,13 @@ def add_to_wishlist(request):
     except IntegrityError:
         raise BookStoreError(get_response_code('invalid_product_id'))
     return Response(get_response_code('added_to_wishlist'))
+
+
+@api_view(('GET',))
+@login_required
+def get_view(request):
+    user_id = get_current_user(request)
+    wishlist = WishListModel.objects.all(params=user_id)
+    products = Product.objects.filter(wishlist)
+    serializer = ProductSerializer(products, many = True)
+    return Response(serializer.data)
