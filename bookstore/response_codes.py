@@ -33,7 +33,8 @@ responses= {
      'programming_error' : {"status":500, 'message':'Something went wrong'},
      'integrity_error' : {"status":500, 'message':'Something went wrong'},
      'too_many_otp' : {'status' : 400 , 'message': 'You have tried too many times. Please come back again tommorow'},
-     'logout' : {'status' :200, 'message' : 'Logged out successfully!'}
+     'logout' : {'status' :200, 'message' : 'Logged out successfully!'},
+     'invalid_data' : {'status' : 400, 'message':'Invalid Data'}
     }
 
 
