@@ -38,7 +38,7 @@ class CartManager:
         return CartManager.all(query=query,params=params)
 
     @staticmethod
-    def insert(obj):
+    def insert(obj):    
         total_quantity = db.execute_sql('select quantity from product where id = %s', (obj.product_id,), False)
         if total_quantity >= int(obj.quantity):
             count = db.execute_sql('select quantity from cart where product_id = %s and user_id = %s', (obj.product_id, obj.user_id), False)
