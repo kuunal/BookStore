@@ -14,7 +14,7 @@ def jwt_decode(token):
         user_email=payload.get('user_id')
         return user_email
     except jwt.DecodeError as identifier:   
-        raise BookStoreError(get_response_code('jwt_decode_error'))
+        raise BookStoreError(get_response_code('jwt_auth_error'))
     except jwt.ExpiredSignatureError as indentifier:
         raise BookStoreError(get_response_code('jwt_signature_expired'))   
 
