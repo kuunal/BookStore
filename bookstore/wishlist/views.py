@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from products.models import Product
 from login.services import get_current_user
 from rest_framework.decorators import api_view
-from .serializer import ProductSerializer
+from .serializer import ProductSerializer, WishListSerializer
 from response_codes import get_response_code
 from django.db import connection, IntegrityError
 from login.services import login_required
@@ -40,25 +40,18 @@ class WishListView(APIView):
             return Response(get_response_code('wishlist_delete_does_exists'))
         return Response(get_response_code('deleted_wishlist_item'))
 
-product_id = openapi.Parameter('id',openapi.IN_QUERY, type=openapi.TYPE_INTEGER, required=True) 
 
-@swagger_auto_schema(method='get' ,manual_parameters=[product_id,],)
-@api_view(('GET',))
+@swagger_auto_schema(method='post', request_body=WishListSerializer)
+@api_view(('POST',))
 @login_required
 def add_to_wishlist(request):
-    product_id = request.GET.get('id')
-    if not product_id.isnumeric():
-        return Response(get_response_code('invalid_product'))
-    user_id  = get_current_user(request)
-    try:
-        count = db.execute_sql('select count(*) from wishlists where product_id = %s and user_id = %s', (product_id, user_id), False)
-        if count > 0:
-            return Response(get_response_code('product_already_in_wishlist'))
-        wishlist = WishListModel(user_id=user_id, product_id=product_id)
-        wishlist.save()
-    except IntegrityError:
-        raise BookStoreError(get_response_code('invalid_product_id'))
-    return Response(get_response_code('added_to_wishlist'))
+    serializer = WishListSerializer(data=request.data)
+    if serializer.is_valid():
+        user_id  = get_current_user(request)
+        serializer.save(user_id= user_id)
+        return Response(get_response_code('added_to_wishlist'))
+    return Response(serializer.errors)
+    
 
 
 @api_view(('GET',))
