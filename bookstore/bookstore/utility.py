@@ -21,11 +21,12 @@ class DataBaseOperations:
                 return result[0] if result else None
             return res
         except DatabaseError:
-            raise BookStoreError(get_response_code('database_error'))
+            raise BookStoreError(get_response_code('invalid_product_id'))
         except ProgrammingError:
             raise BookStoreError(get_response_code('programming_error'))
         except IntegrityError:
-            raise BookStoreError(get_response_code('integrity_error'))
+            raise BookStoreError(get_response_code('invalid_product_id'))
+            
 
 
             
