@@ -16,7 +16,7 @@ class OrderView(APIView):
         user_id = get_current_user(request)
         orders = OrderModel.objects.filter(user_id)
         serializer = ResponseSerializer(orders, many=True)
-        total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in orders])
+        total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in orders])
         return Response({'order':serializer.data, 'total':total})
         
     @swagger_auto_schema(request_body=OrderSerializer)
