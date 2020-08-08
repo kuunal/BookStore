@@ -11,7 +11,7 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
-from .services import check_if_otp_generated_for_more_than_limit_for_user, check_if_user_is_blocked
+from .services import check_if_otp_generated_for_more_than_limit_for_user, check_if_user_is_blocked, login_required
 from bookstore.redis_setup import get_redis_instance
 from bookstore import settings
 from response_codes import get_response_code
@@ -40,7 +40,7 @@ class LoginView(APIView):
                     check_if_otp_generated_for_more_than_limit_for_user(phone_no)
                     check_if_user_is_blocked(phone_no)
                     random_otp = gen_otp()
-                    # send_otp_to_user_while_login.delay(phone_no, random_otp)  
+                    send_otp_to_user_while_login.delay(phone_no, random_otp)  
                     db.execute_sql('insert into otp_history(phone_no, otp, datetime) values(%s, %s, %s)',(phone_no, random_otp, timezone.now()))
                     response = get_response_code('otp_sent')
                     response['Phone No.'] = phone_no
@@ -86,6 +86,7 @@ class VerifyOTPView(APIView):
             cursor.close()
 
 @api_view(('GET',))
+@login_required
 def logout(request):
     user_id = get_current_user(request)
     redis_instance = get_redis_instance()
