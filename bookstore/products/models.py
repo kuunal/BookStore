@@ -8,16 +8,17 @@ class ProductManager():
     def all(query="select * from product", params=None):
         rows = db.execute_sql(query, params, True)
         objects = []
-        for row in rows:
-            product_object = Product()
-            product_object.id = row[0]
-            product_object.author = row[6]
-            product_object.title = row[1]
-            product_object.image = row[2]
-            product_object.quantity = row[3]
-            product_object.price = row[4]
-            product_object.description = row[5]
-            objects.append(product_object)
+        if rows:
+            for row in rows:
+                product_object = Product()
+                product_object.id = row[0]
+                product_object.author = row[6]
+                product_object.title = row[1]
+                product_object.image = row[2]
+                product_object.quantity = row[3]
+                product_object.price = row[4]
+                product_object.description = row[5]
+                objects.append(product_object)
 
         return objects
 
