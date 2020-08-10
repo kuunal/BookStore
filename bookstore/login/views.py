@@ -65,8 +65,7 @@ class VerifyOTPView(APIView):
             cursor = conn.cursor()
             original_otps = db.execute_sql('select otp, datetime from otp_history where phone_no = %s', [phone_no], True)
 
-            if len(otp)>0:
-                print(original_otps)
+            if original_otps:
                 latest_otp = original_otps[len(original_otps)-1][0]
                 latest_otp_send_time  = original_otps[len(original_otps)-1][1]  
                 elasped_time = (timezone.now()-latest_otp_send_time).total_seconds()

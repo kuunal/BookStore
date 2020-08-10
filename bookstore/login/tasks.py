@@ -13,7 +13,7 @@ def send_otp_to_user_while_login(phone_no, random_otp):
     send_otp(phone_no, random_otp)
 
 @shared_task
-def order_placed_mail_to_user(obj, total, user_id):
+def order_placed_mail_to_user(obj, total, user_id, order_id, address):
     user_email = LoginManager.get(user_id)
-    send_custom_mail(obj, TEMPLATE_NAME, SUBJECT_FOR_ORDER_PLACED, user_email, total)
+    send_custom_mail(obj, TEMPLATE_NAME, SUBJECT_FOR_ORDER_PLACED, user_email, total, order_id, address)
 
