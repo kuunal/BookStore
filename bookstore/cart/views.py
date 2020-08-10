@@ -58,7 +58,7 @@ def add_to_cart(request):
     if serializer.is_valid():
         user_id  = get_current_user(request)
         serializer.save(user_id=user_id)
-        return Response(get_response_code('added_to_wishlist'))
+        return Response(get_response_code('added_to_cart'))
     return Response(serializer.data)
 
 '''
@@ -83,10 +83,10 @@ def order(request):
     user_id = get_current_user(request)
     address = request.data['address']
     items = CartModel.objects.all(user_id)
-    if len(items) < 1:
-        raise BookStoreError(get_response_code("no_product_to_order"))
-    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in result])
-    if len(result)==0:
+    # if len(items) < 1:
+    #     raise BookStoreError(get_response_code("no_product_to_order"))
+    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in items])
+    if len(items)==0:
         raise BookStoreError(get_response_code('item_not_in_cart'))
     id = get_latest_order_id()
     OrderManager.insert(items, total, address, id)
