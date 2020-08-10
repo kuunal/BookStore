@@ -20,7 +20,9 @@ class CartAddSerializer(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField()
 
-
+    '''
+        Validate quantity must be greater than 0
+    '''
     def validate(self, validated_data):
         for values in validated_data.values():
             if values <= 0:

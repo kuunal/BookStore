@@ -7,6 +7,9 @@ from bookstore.utility import DataBaseOperations as db
 from bookstore.book_store_exception import BookStoreError
 class CartManager:
 
+    '''
+        Get all products in cart related to certain user
+    '''
     @staticmethod
     def all(user_id=None, params=None, query=None):
         if not query:
@@ -31,12 +34,18 @@ class CartManager:
         return objects
         
 
+    '''
+        Get certain product from user cart related 
+    '''
     @staticmethod
     def get(id, user_id):
         query = 'select p.*, c.quantity, c.user_id from cart c inner join product p on c.product_id = p.id where c.user_id = %s and c.product_id=%s'
         params = (user_id, id)
         return CartManager.all(query=query,params=params)
 
+    '''
+        Insert or update product into cart by checking if quantity is less than the available quantity
+    '''
     @staticmethod
     def insert(obj):
         total_quantity = db.execute_sql('select quantity from product where id = %s', (obj.product_id,), False)

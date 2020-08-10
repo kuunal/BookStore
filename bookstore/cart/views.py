@@ -20,6 +20,9 @@ from drf_yasg import openapi
 
 class CartView(APIView):
     
+    '''
+        Detailed view for cart product along with total based on quantity related to specific user 
+    '''
     @login_required
     def get(self, request, id=None):
         user_id  = get_current_user(request)
@@ -32,6 +35,9 @@ class CartView(APIView):
         serializer = CartSerializer(result, many = True)
         return Response({'cart':serializer.data, 'total':total})
 
+    '''
+        Delete product from cart if exists
+    '''
     @login_required
     def delete(self, request, id=None):
         user_id = get_current_user(request)
@@ -41,6 +47,9 @@ class CartView(APIView):
         return Response(get_response_code('removed_cart_item'))
 
 
+'''
+    Adding products into cart 
+'''
 @swagger_auto_schema(method='post', request_body=CartAddSerializer)
 @api_view(('POST',))
 @login_required
@@ -52,7 +61,9 @@ def add_to_cart(request):
         return Response(get_response_code('added_to_wishlist'))
     return Response(serializer.data)
 
-
+'''
+    Get all products from cart
+'''
 @api_view(('GET',))
 @login_required
 def get_view(request):
@@ -62,6 +73,9 @@ def get_view(request):
     serializer = CartSerializer(items, many = True)
     return Response({'cart':serializer.data, 'total':total})
 
+'''
+    Order all products from cart
+'''
 @swagger_auto_schema(method='post', request_body=CartOrderSerializer)
 @api_view(('POST',))
 @login_required
@@ -69,6 +83,8 @@ def order(request):
     user_id = get_current_user(request)
     address = request.data['address']
     items = CartModel.objects.all(user_id)
+    if len(items) < 1:
+        raise BookStoreError(get_response_code("no_product_to_order"))
     total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in result])
     if len(result)==0:
         raise BookStoreError(get_response_code('item_not_in_cart'))
