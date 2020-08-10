@@ -17,6 +17,9 @@ from drf_yasg import openapi
 
 class WishListView(APIView):
 
+    '''
+        Detail view ow wishlist item
+    '''
     @login_required
     def get(self, request, id=None):
         user_id  = get_current_user(request)
@@ -41,6 +44,9 @@ class WishListView(APIView):
         return Response(get_response_code('deleted_wishlist_item'))
 
 
+'''
+    Add onto wishlist of logged in user
+'''
 @swagger_auto_schema(method='post', request_body=WishListSerializer)
 @api_view(('POST',))
 @login_required
@@ -53,7 +59,9 @@ def add_to_wishlist(request):
     return Response(serializer.errors)
     
 
-
+'''
+    Get all wishlist items for logged in user
+'''
 @api_view(('GET',))
 @login_required
 def get_view(request):
