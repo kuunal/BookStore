@@ -70,10 +70,6 @@ class OrderManager:
 
 
 
-
-
-
-
 class OrderModel:
     objects = OrderManager()
 

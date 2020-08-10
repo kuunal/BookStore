@@ -158,7 +158,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
-# CELERY_BROKER_URL = 'amqp://user@pass:rabbitmq:5672//'
+CELERY_BROKER_URL = 'amqp://user@pass:rabbitmq:5672//'
 
 LOGGING = {
     'version':1,
@@ -192,7 +192,7 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'in': 'header',
             'name': 'x-token'
-        },'api_key1': {
+        },'api_key_pno': {
             'type': 'apiKey',
             'in': 'header',
             'name': 'x-phoneno'
