@@ -3,6 +3,7 @@ JWT_EXPIRATION_TIME=300
 OTP_EXPIRY_TIME=300
 OTP_BLOCK_TIME=3600 
 PAGINATOR_PAGE_LIMIT = 5
+OTP_GENERATION_LIMIT = 4
 
 responses= {
      'no_headers' : {'status' : 401, 'message' : 'No headers found'},
@@ -34,7 +35,8 @@ responses= {
      'integrity_error' : {"status":500, 'message':'Something went wrong'},
      'too_many_otp' : {'status' : 400 , 'message': 'You have tried too many times. Please come back again tommorow'},
      'logout' : {'status' :200, 'message' : 'Logged out successfully!'},
-     'invalid_data' : {'status' : 400, 'message':'Invalid Data'}
+     'invalid_data' : {'status' : 400, 'message':'Invalid Data'},
+     'no_product_to_order': {'status': 400, 'message': 'No products to order'},
     }
 
 
