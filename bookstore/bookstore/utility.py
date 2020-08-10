@@ -6,8 +6,10 @@ from django.db import DatabaseError, IntegrityError, ProgrammingError
 from bookstore.book_store_exception import BookStoreError
 
 class DataBaseOperations:
-    
 
+    '''
+        Comman database connection with try catch for all uses to avoid try catch everytime
+    '''
     @staticmethod
     def execute_sql(query=None,  params=None, many=None):
         try:
@@ -26,11 +28,6 @@ class DataBaseOperations:
             raise BookStoreError(get_response_code('programming_error'))
         except IntegrityError:
             raise BookStoreError(get_response_code('invalid_product_id'))
-            
-
-
-            
-
         finally:
             cursor.close()
     
