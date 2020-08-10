@@ -1,46 +1,42 @@
-version: 3
+version: '3'
 services:
     'db':
         image: 'mysql:5.7'
-        ports: 
+        ports:
             - 3306:3306
-        environment: 
+        environment:
             MYSQL_DATABASE: "book_store"
             MYSQL_USER: "root"
             MYSQL_PASSWORD: "1234"
             MYSQL_ROOT_PASSWORD: "1234"
-        volumes: 
+        volumes:
+            - "/home/ubuntu/db/dump:/docker-entrypoint-initdb.d"
             - "/home/ubuntu/db/dbdata:/var/lib/mysql"
         restart: always
-    
+
     'rabbitmq':
         image: rabbitmq:3-management
-        environment: 
-            - RABBITMQ_DEFAULT_USER = user
-            - RABBITMQ_DEFAULT_PASSWORD = pass
-            - RABBITMQ_DEFAULT_VHOST = /
-        ports: 
+        ports:
             - "5672:5672"
             - "15672:15672"
-        
+
     'redis':
         image: redis:latest
-        ports: 
+        ports:
             - '6379:6379'
-        
+
     'book_store':
         build: .
-        command: 
+        command:
             bash -c "sleep 20; cd bookstore
-            && (celery -A bookstore worker)
-            && python manage.py runserver 0.0.0.0:8000"
-        volumes: 
+            && (celery -A bookstore worker &)
+            && (python3 manage.py runserver 0.0.0.0:8000 ) "
+        volumes:
             - ".:/app"
-        ports: 
-            "- 8000:8000"
+        ports:
+            - "8000:8000"
         depends_on:
             - db
             - rabbitmq
             -  redis
         restart: always
-
