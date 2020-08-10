@@ -5,11 +5,15 @@ from datetime import timedelta
 from bookstore import settings
 from bookstore.redis_setup import get_redis_instance
 from .default_jwt import jwt_decode
-from response_codes import get_response_code
+from response_codes import get_response_code, OTP_GENERATION_LIMIT
 from rest_framework import authentication, exceptions
 from bookstore.book_store_exception import BookStoreError
 from bookstore.utility import DataBaseOperations as db
 
+
+'''
+    Gives currently logged in user or throws and exception 
+'''
 def get_current_user(request):
     redis_instance = get_redis_instance()
     token = request.headers.get("x_token")
@@ -19,7 +23,9 @@ def get_current_user(request):
             return user_id
     raise BookStoreError(get_response_code('login_required'))
 
-
+'''
+    Makes sure if for applied funtions for user to be logged in
+'''
 def login_required(func):
     def wrapper(obj=None, request=None, id=None):
         if request==None:
@@ -29,24 +35,29 @@ def login_required(func):
         return func(obj, request, id)
     return wrapper
 
+'''
+    Blocks user if exceeds otp generation limit
+'''
 def check_if_otp_generated_for_more_than_limit_for_user(phone_no):
     count = db.execute_sql('select count(*) from otp_history', None, True)
     count = count[0][0]
-    if count and count > 4:
+    if count and count > OTP_GENERATION_LIMIT:
         blocked_time = timezone.now()+timedelta(days=1)
         db.execute_sql('delete from otp_history where phone_no = %s',(phone_no,))
         db.execute_sql('insert into otp_history(phone_no, otp, datetime) values(%s,%s,%s)', (phone_no, "blockd", blocked_time))
         raise BookStoreError(get_response_code("too_many_otp"))
 
-
-
+'''
+    Returns time remaining for unblock for blocked user
+'''
 def calculate_remaining_block_time(block_time):
     remaining_block_time = (timezone.now() - block_time).total_seconds()//settings.OTP_BLOCK_TIME
     print(remaining_block_time, block_time)
     return remaining_block_time 
                 
-        
-
+'''
+    Checks and ublocks user if block time is expired for certain user
+'''
 def check_if_user_is_blocked(phone_no):
     current_time = timezone.now()
     cursor = cn.cursor()

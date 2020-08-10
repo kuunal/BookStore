@@ -26,7 +26,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 class LoginView(APIView):   
     serializer_class = LoginSerializer
-
+ 
     @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
         login_id = request.data['login_id']
