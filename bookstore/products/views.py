@@ -22,6 +22,9 @@ desc_param = openapi.Parameter('des', openapi.IN_QUERY, description="test manual
 
 class ProductView(APIView):
 
+    '''
+        Get all product from database based on given parameters
+    '''
     @swagger_auto_schema(manual_parameters=[page_param, sortby_param, desc_param], )
     def get(self, request, pk=None):
         if pk:

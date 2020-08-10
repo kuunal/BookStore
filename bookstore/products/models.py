@@ -3,7 +3,9 @@ from django.db import connection
 from bookstore.utility import DataBaseOperations as db 
 
 class ProductManager():
-
+    '''
+        Get all products from database
+    '''
     @staticmethod
     def all(query="select * from product", params=None):
         rows = db.execute_sql(query, params, True)
