@@ -7,6 +7,7 @@ from bookstore.book_store_exception import BookStoreError
 from bookstore.utility import DataBaseOperations as db
 from response_codes import get_response_code
 
+
 class OrderManager:
     
     '''
@@ -58,16 +59,14 @@ class OrderManager:
 
             result =  db.execute_sql(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
             product_info = {
-                'order_id': id,
                 'title':title,
                 'image': image,
                 'price':price,
                 'author':author,
                 'quantity': orders.quantity,
-                'address': orders.address
             }
             mail_response.append(product_info)
-        order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id)   
+        order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, order_id, address )   
 
 
 

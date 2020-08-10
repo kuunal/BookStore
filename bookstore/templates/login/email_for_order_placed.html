@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <p><strong>ORDER ID :</strong> <div style="color:red">{{data.order_id}}</div><p>
+    <p><strong>ORDER ID :</strong> <div style="color:red">{{order_id}}</div><p>
 {% for data in order_data_object  %}
     <p><strong>TITLE :</strong> <div style="color:red">{{data.title}}</div><p>
     <p><strong>AUTHOR :</strong> <div style="color:red">{{data.author}}</div><p>
@@ -10,6 +10,6 @@
     <p><strong>QUANTITY :</strong> <div style="color:red">{{data.quantity}}</div><p>  
     <p><strong>TOTAL :</strong> <div style="color:red">{{total}}</div><p>
 {% endfor %}
-    <p><strong>ADDRESS :</strong> <div style="color:red">{{data.address}}</div><p>
+    <p><strong>ADDRESS :</strong> <div style="color:red">{{address}}</div><p>
 </body>
 </html>
