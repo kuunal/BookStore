@@ -9,7 +9,9 @@ from response_codes import get_response_code
 
 class OrderManager:
     
-
+    '''
+        Get all previous orders for logged in user
+    '''
     @staticmethod
     def filter(user_id, query=None,params=None):
         query = 'select p.*, o.quantity, o.address as quantity_in_order from orders o inner join product p on o.product_id = p.id where o.user_id = %s'
@@ -30,7 +32,9 @@ class OrderManager:
                 objects.append(order_object)
         return objects  
         
-
+    '''
+        Place order for logged in user if quantity is available 
+    '''
     @staticmethod
     def insert(obj, total=None, address=None, id = None):
         id = get_latest_order_id()
@@ -54,11 +58,13 @@ class OrderManager:
 
             result =  db.execute_sql(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
             product_info = {
+                'order_id': id,
                 'title':title,
                 'image': image,
                 'price':price,
                 'author':author,
-                'quantity':orders.quantity
+                'quantity': orders.quantity,
+                'address': orders.address
             }
             mail_response.append(product_info)
         order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id)   

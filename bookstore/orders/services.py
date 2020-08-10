@@ -1,6 +1,10 @@
 from django.db import connection as cn
 from bookstore.utility import DataBaseOperations as db
 
+
+'''
+    Get latest order id from database
+'''
 def get_latest_order_id():
     cursor = cn.cursor()
     id = db.execute_sql('select order_id from orders order by order_id desc limit 1', None, False)

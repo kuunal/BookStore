@@ -10,15 +10,22 @@ from bookstore import settings
 from login.services import login_required
 from drf_yasg.utils import swagger_auto_schema
 
-# Create your views here.
+
 class OrderView(APIView):
+    
+    '''
+        Get all previous orders for logged in user
+    '''
     def get(self, request):
         user_id = get_current_user(request)
         orders = OrderModel.objects.filter(user_id)
         serializer = ResponseSerializer(orders, many=True)
         total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in orders])
         return Response({'order':serializer.data, 'total':total})
-        
+
+    '''
+        Place an order for logged in user
+    '''
     @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
         user_id = get_current_user(request)
