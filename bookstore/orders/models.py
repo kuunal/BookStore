@@ -66,7 +66,7 @@ class OrderManager:
                 'quantity': orders.quantity,
             }
             mail_response.append(product_info)
-        order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, order_id, address )   
+        order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, id, address )   
 
 
 
