@@ -18,7 +18,6 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from bookstore.redis_setup import get_redis_instance
 from products.services import get_cache_item, set_cache
-from .services import any_item_in_cart_out_of_stock
 
 class CartView(APIView):
     
@@ -91,4 +90,3 @@ def order(request):
     id = get_latest_order_id()
     response = OrderManager.insert(items, total, address, id)
     return Response(response)
-    
