@@ -16,7 +16,9 @@ from login.services import login_required
 from bookstore.book_store_exception import BookStoreError
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from bookstore.redis_setup import get_redis_instance
+from products.services import get_cache_item, set_cache
+from .services import any_item_in_cart_out_of_stock
 
 class CartView(APIView):
     
@@ -83,11 +85,10 @@ def order(request):
     user_id = get_current_user(request)
     address = request.data['address']
     items = CartModel.objects.all(user_id)
-    # if len(items) < 1:
-    #     raise BookStoreError(get_response_code("no_product_to_order"))
-    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in items])
-    if len(items)==0:
+    if len(items) == 0:
         raise BookStoreError(get_response_code('item_not_in_cart'))
+    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in items])
     id = get_latest_order_id()
-    OrderManager.insert(items, total, address, id)
-    return Response(get_response_code('order_placed'))
+    response = OrderManager.insert(items, total, address, id)
+    return Response(response)
+    
