@@ -3,7 +3,7 @@ from celery import shared_task
 from .otp import send_otp
 from .models import LoginManager
 from .send_mail import send_custom_mail
-from product.models import Product
+from products.models import Product
 from products.services import set_cache
 
 
