@@ -6,7 +6,7 @@ from login.tasks import order_placed_mail_to_user
 from bookstore.book_store_exception import BookStoreError
 from bookstore.utility import DataBaseOperations as db
 from response_codes import get_response_code
-
+from .services import generate_cancelled_products
 
 class OrderManager:
     
@@ -15,7 +15,7 @@ class OrderManager:
     '''
     @staticmethod
     def filter(user_id, query=None,params=None):
-        query = 'select p.*, o.quantity, o.address as quantity_in_order from orders o inner join product p on o.product_id = p.id where o.user_id = %s'
+        query = 'select p.*, o.quantity, o.address from orders o inner join product p on o.product_id = p.id where o.user_id = %s'
         params = (user_id,)
         records = db.execute_sql(query, params, True)
         objects = []
@@ -39,6 +39,7 @@ class OrderManager:
     @staticmethod
     def insert(obj, total=None, address=None, id = None):
         id = get_latest_order_id()
+        order_status={'products_cancelled':{}}
         mail_response = []
         for orders in obj:
             result = db.execute_sql('select quantity, price, image, title, author from product where id = %s', (orders.product_id,),True)[0]
@@ -47,16 +48,18 @@ class OrderManager:
             image = result[2]
             title = result[3]
             author = result[4]
+            
+            if  available_quantity == 0 :
+                order_status = generate_cancelled_products(order_status, 'not_available', title)
+                continue
+
+            if available_quantity < orders.quantity:
+                order_status = generate_cancelled_products(order_status, 'out_of_stock', title)
+                continue 
             if not address:
                 address = orders.address
                 total = orders.quantity * price 
-            if  available_quantity == 0 :
-                raise BookStoreError(get_response_code('not_available')) 
-            if available_quantity < orders.quantity:
-                raise BookStoreError(get_response_code('out_of_stock')) 
-            
             query = 'insert into orders(user_id, product_id, quantity, address, order_id) values(%s, %s, %s, %s, %s)'
-
             result =  db.execute_sql(query, (orders.user_id, orders.product_id, orders.quantity, address, id))
             product_info = {
                 'title':title,
@@ -66,7 +69,14 @@ class OrderManager:
                 'quantity': orders.quantity,
             }
             mail_response.append(product_info)
-        order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, id, address )   
+        if len(mail_response) > 0:
+            order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, id, address )   
+            order_status['Order Placed'] = mail_response
+        return get_response_code('order_placed') if len(order_status['products_cancelled'])==0 else order_status
+
+
+
+
 
 
 
