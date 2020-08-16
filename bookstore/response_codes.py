@@ -7,7 +7,7 @@ OTP_GENERATION_LIMIT = 4
 
 responses= {
      'no_headers' : {'status' : 401, 'message' : 'No headers found'},
-     'invalid_login' :{'status':400, 'message':'Invalid login_id'},
+     'invalid_login' :{'status':401, 'message':'Invalid login_id'},
      'login_required' : {'status':401 ,'message' : 'Please login first'},
      'jwt_auth_error' : {'status' : 401, 'message' : 'Invalid Token'},
      'jwt_decode_error' : { 'status' : 400, 'message' : 'JWT decode error'},
@@ -31,8 +31,8 @@ responses= {
      'item_not_in_cart':{'status':400, 'message':'No such item in cart'},
      'removed_cart_item' : {'status':200, 'message':'Removed from cart'},
      'database_error' : {"status":500, 'message':'Something went wrong'}, 
-     'programming_error' : {"status":500, 'message':'Something went wrong'},
-     'integrity_error' : {"status":500, 'message':'Something went wrong'},
+     'programming_error' : {"status":500, 'message':'Something wrong with query'},
+     'integrity_error' : {"status":500, 'message':'Something went wrong with foreign key reference'},
      'too_many_otp' : {'status' : 400 , 'message': 'You have tried too many times. Please come back again tommorow'},
      'logout' : {'status' :200, 'message' : 'Logged out successfully!'},
      'invalid_data' : {'status' : 400, 'message':'Invalid Data'},
