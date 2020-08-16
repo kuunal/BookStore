@@ -45,6 +45,8 @@ class LoginView(APIView):
                     response = get_response_code('otp_sent')
                     response['Phone No.'] = phone_no
                     return Response(response)
+                else:
+                    return Response(get_response_code('invalid_login'))
             except TypeError:
                 return Response(get_response_code('login_failed')) 
             finally:

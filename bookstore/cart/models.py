@@ -23,12 +23,17 @@ class CartManager:
                 obj.product_id = row[0]
                 obj.title = row[1]
                 obj.image = row[2]
-                obj.quantity = row[7]
                 obj.price = row[4]
                 obj.description = row[5]
                 obj.author = row[6]
                 obj.quantity_in_cart = row[7]
                 obj.user_id = row[8]
+                if row[3] == 0:
+                    obj.quantity = "out of stock"
+                elif row[3] >= row[7]:
+                    obj.quantity = row[7]
+                else: 
+                    obj.quantity = "out of stock for quantity "+str(row[7])+", available quantity is "+str(row[3])                    
 
                 objects.append(obj)
         return objects
@@ -49,6 +54,8 @@ class CartManager:
     @staticmethod
     def insert(obj):
         total_quantity = db.execute_sql('select quantity from product where id = %s', (obj.product_id,), False)
+        if not total_quantity:
+            raise BookStoreError(get_response_code('invalid_product_id'))
         if total_quantity >= int(obj.quantity):
             count = db.execute_sql('select quantity from cart where product_id = %s and user_id = %s', (obj.product_id, obj.user_id), False)
             if count:

@@ -29,11 +29,11 @@ class CartView(APIView):
         user_id  = get_current_user(request)
         if id:
             try:
-                result = CartModel.objects.get(id, user_id)
+                items = CartModel.objects.get(id, user_id)
             except IndexError:
                 return Response(get_response_code('invalid_product_id'))
-        total = sum([total.price if total.quantity == 1 else total.price*total.quantity for total in result])
-        serializer = CartSerializer(result, many = True)
+        total = sum([0 if type(item.quantity) == str  else item.price*item.quantity for item in items])
+        serializer = CartSerializer(items, many = True)
         return Response({'cart':serializer.data, 'total':total})
 
     '''
@@ -70,7 +70,7 @@ def add_to_cart(request):
 def get_view(request):
     user_id  = get_current_user(request)
     items = CartModel.objects.all(user_id)
-    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in items])
+    total = sum([0 if type(item.quantity) == str  else item.price*item.quantity for item in items])
     serializer = CartSerializer(items, many = True)
     return Response({'cart':serializer.data, 'total':total})
 
@@ -86,7 +86,7 @@ def order(request):
     items = CartModel.objects.all(user_id)
     if len(items) == 0:
         raise BookStoreError(get_response_code('item_not_in_cart'))
-    total = sum([item.price if item.quantity == 1 else item.price*item.quantity for item in items])
+    total = sum([0 if type(item.quantity) == str  else item.price*item.quantity for item in items])
     id = get_latest_order_id()
     response = OrderManager.insert(items, total, address, id)
     return Response(response)
