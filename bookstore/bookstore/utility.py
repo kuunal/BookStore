@@ -22,8 +22,8 @@ class DataBaseOperations:
                 result = cursor.fetchone()
                 return result[0] if result else None
             return res
-        except DatabaseError:
-            raise BookStoreError(get_response_code('invalid_product_id'))
+        except DatabaseError as e:
+            raise BookStoreError(get_response_code('database_error'))
         except ProgrammingError:
             raise BookStoreError(get_response_code('programming_error'))
         except IntegrityError:
