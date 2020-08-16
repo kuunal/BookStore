@@ -21,6 +21,9 @@ class WishListSerializer(serializers.Serializer):
         for data in validated_data.values():
             if data <= 0:
                 raise BookStoreError(get_response_code('invalid_data')) 
+        product_quantity = db.execute_sql('select title from product where id = %s',(validated_data['product_id'],))
+        if not product_quantity:
+            raise BookStoreError(get_response_code('invalid_data'))
         return validated_data
 
     def create(self, validated_data):
