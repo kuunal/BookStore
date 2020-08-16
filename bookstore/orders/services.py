@@ -20,7 +20,7 @@ def generate_cancelled_products(order_status, response, title):
         order_status['products_cancelled']['title'].append(title)
     except KeyError:
         order_status['products_cancelled']['title'] = [title,]
-    order_status['products_cancelled']['reason'] = get_response_code(response)
+    order_status['products_cancelled']['reason'] = response
     return order_status
 
 

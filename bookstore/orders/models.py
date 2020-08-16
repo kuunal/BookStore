@@ -42,19 +42,22 @@ class OrderManager:
         order_status={'products_cancelled':{}}
         mail_response = []
         for orders in obj:
-            result = db.execute_sql('select quantity, price, image, title, author from product where id = %s', (orders.product_id,),True)[0]
-            available_quantity = result[0]
-            price = result[1]
-            image = result[2]
-            title = result[3]
-            author = result[4]
+            product = db.execute_sql('select quantity, price, image, title, author from product where id = %s', (orders.product_id,),True)
+            if not product:
+                raise BookStoreError(get_response_code('invalid_product_id'))
+            product = product[0]
+            available_quantity = product[0]
+            price = product[1]
+            image = product[2]
+            title = product[3]
+            author = product[4]
             
             if  available_quantity == 0 :
-                order_status = generate_cancelled_products(order_status, 'not_available', title)
+                order_status = generate_cancelled_products(order_status, get_response_code('not_available'), title)
                 continue
 
-            if available_quantity < orders.quantity:
-                order_status = generate_cancelled_products(order_status, 'out_of_stock', title)
+            if type(orders.quantity)==str or orders.quantity > available_quantity:
+                order_status = generate_cancelled_products(order_status, f'out_of_stock for quantity {orders.quantity}', title)
                 continue 
             if not address:
                 address = orders.address
@@ -72,6 +75,7 @@ class OrderManager:
         if len(mail_response) > 0:
             order_placed_mail_to_user.delay(mail_response, total, obj[0].user_id, id, address )   
             order_status['Order Placed'] = mail_response
+        order_status['status']=200
         return get_response_code('order_placed') if len(order_status['products_cancelled'])==0 else order_status
 
 
@@ -94,7 +98,10 @@ class OrderModel:
 
     def save(self):
         if not self.id:
-            self.objects.insert([self,])
-
+            order_status =  self.objects.insert([self,])
+        try:
+            _ = order_status['message'] 
+        except KeyError:
+            raise BookStoreError(order_status)
 
 
