@@ -4,5 +4,5 @@ from .views import LoginView, VerifyOTPView
 
 urlpatterns = [
     path('/', LoginView.as_view(), name="login"),
-    path('/verify/', VerifyOTPView.as_view())
+    path('/verify/', VerifyOTPView.as_view(), name="otp")
 ]

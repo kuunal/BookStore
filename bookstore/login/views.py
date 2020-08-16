@@ -21,6 +21,7 @@ from login.services import get_current_user
 from redis import DataError
 from bookstore.book_store_exception import BookStoreError
 from drf_yasg.utils import swagger_auto_schema
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -46,7 +47,7 @@ class LoginView(APIView):
                     response['Phone No.'] = phone_no
                     return Response(response)
                 else:
-                    return Response(get_response_code('invalid_login'))
+                    return Response(get_response_code('login_failed'))
             except TypeError:
                 return Response(get_response_code('login_failed')) 
             finally:
