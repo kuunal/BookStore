@@ -52,7 +52,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema' }
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema',
+    'EXCEPTION_HANDLER': 'bookstore.book_store_exception.custom_exception_handler' 
+ }
 
 # Application definition
 
@@ -63,6 +66,7 @@ INSTALLED_APPS = [
     'cart',
     'login',
     'drf_yasg',
+    'corsheaders',
     'rest_framework',
     'django_filters',
     'django.contrib.admin',
@@ -72,12 +76,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-
+CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+CORS_ALLOW_CREDENTIALS = True
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -158,32 +165,31 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
-# CELERY_BROKER_URL = 'amqp://user@pass:rabbitmq:5672//'
 
-LOGGING = {
-    'version':1,
-    'disable_existing_loggers': False,
-    'loggers':{
-        'django' : {
-            'handlers':['default_handler',],
-            'level' : 'DEBUG',
-        }
-    },
-    'handlers':{
-        'default_handler':{
-            'level':'INFO',
-            'class':'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'), 
-            'formatter':'default_formatter',
-        }
-    },
-    'formatters':{
-        'default_formatter':{
-            'format': '{levelname} {asctime} {module} {message}',
-            'style':'{' 
-        }
-    }
-}
+# LOGGING = {
+#     'version':1,
+#     'disable_existing_loggers': False,
+#     'loggers':{
+#         'django' : {
+#             'handlers':['default_handler',],
+#             'level' : 'DEBUG',
+#         }
+#     },
+#     'handlers':{
+#         'default_handler':{
+#             'level':'INFO',
+#             'class':'logging.FileHandler',
+#             'filename': os.path.join(BASE_DIR, 'debug.log'), 
+#             'formatter':'default_formatter',
+#         }
+#     },
+#     'formatters':{
+#         'default_formatter':{
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style':'{' 
+#         }
+#     }
+# }
 
 
 SWAGGER_SETTINGS = {
