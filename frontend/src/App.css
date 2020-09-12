@@ -1,0 +1,19 @@
+*{
+  padding: 0px;
+  margin: 0px;
+  word-wrap: 'break-word';
+}
+
+li{
+  list-style-type: none;
+}
+/* 
+img{
+  height: '20px';
+} */
+
+p{
+  background:white;
+  
+  /* height:100% */
+}
