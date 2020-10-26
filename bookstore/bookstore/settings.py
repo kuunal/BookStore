@@ -24,104 +24,125 @@ environ.Env.read_env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 from response_codes import OTP_EXPIRY_TIME, OTP_BLOCK_TIME, JWT_EXPIRATION_TIME
-SECRET_KEY = env('DJANGO_SECRET_KEY')
-JWT_SECRET_KEY = env('JWT_SECRET_KEY')
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+JWT_SECRET_KEY = env("DJANGO_SECRET_KEY")
 JWT_EXPIRATION_TIME = JWT_EXPIRATION_TIME
 OTP_EXPIRY_TIME = OTP_EXPIRY_TIME
 OTP_BLOCK_TIME = OTP_BLOCK_TIME
-REDIS_HOST = env('REDIS_HOST')
-REDIS_PORT = env('REDIS_PORT')
-DATABASE_NAME = env('DATABASE_NAME')
-DATABASE_USER = env('DATABASE_USER')
-DATABASE_PASSWORD = env('DATABASE_PASSWORD')
-DATABASE_HOST = env('DATABASE_HOST')
-DATABASE_PORT = env('DATABASE_PORT')
-TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
-TWILIO_NUMBER = env('TWILIO_NUMBER')
+REDIS_HOST = env("REDIS_HOST")
+REDIS_PORT = env("REDIS_PORT")
+DATABASE_NAME = env("DATABASE_NAME")
+DATABASE_USER = env("DATABASE_USER")
+DATABASE_PASSWORD = env("DATABASE_PASSWORD")
+DATABASE_HOST = env("DATABASE_HOST")
+DATABASE_PORT = env("DATABASE_PORT")
+TWILIO_ACCOUNT_SID = env("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = env("TWILIO_AUTH_TOKEN")
+TWILIO_NUMBER = env("TWILIO_NUMBER")
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = env('EMAIL_ID')
-EMAIL_HOST_PASSWORD = env('PASS')
-EMAIL_PORT = 587    
-HOST = 'localhost'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = env("EMAIL_ID")
+EMAIL_HOST_PASSWORD = env("PASS")
+EMAIL_PORT = 587
+HOST = "localhost"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema',
-    'EXCEPTION_HANDLER': 'bookstore.book_store_exception.custom_exception_handler' 
- }
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    "EXCEPTION_HANDLER": "bookstore.book_store_exception.custom_exception_handler",
+}
 
 # Application definition
 
 INSTALLED_APPS = [
-    'products',
-    'wishlist',
-    'orders',
-    'cart',
-    'login',
-    'drf_yasg',
-    'corsheaders',
-    'rest_framework',
-    'django_filters',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-]
-CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
-CORS_ALLOW_CREDENTIALS = True
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "products",
+    "wishlist",
+    "orders",
+    "cart",
+    "login",
+    "drf_yasg",
+    "corsheaders",
+    "rest_framework",
+    "django_filters",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 ]
 
-ROOT_URLCONF = 'bookstore.urls'
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "x-token",
+    "x_token",
+]
+# CORS_ORIGIN_ALLOW_ALL = (
+#     True  # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+# )
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+ROOT_URLCONF = "bookstore.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'bookstore.wsgi.application'
+WSGI_APPLICATION = "bookstore.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': DATABASE_NAME,
-        'USER': DATABASE_USER,
-        'PASSWORD': DATABASE_PASSWORD,
-        'HOST': DATABASE_HOST,
-        'PORT': DATABASE_PORT
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": DATABASE_NAME,
+        "USER": DATABASE_USER,
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
+        "PORT": DATABASE_PORT,
     }
 }
 
@@ -131,16 +152,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -148,9 +169,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Kolkata'
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 
@@ -162,9 +183,9 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}'
+CELERY_RESULT_BACKEND = f"db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
 # LOGGING = {
 #     'version':1,
@@ -179,30 +200,22 @@ CELERY_RESULT_BACKEND= f'db+mysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABAS
 #         'default_handler':{
 #             'level':'INFO',
 #             'class':'logging.FileHandler',
-#             'filename': os.path.join(BASE_DIR, 'debug.log'), 
+#             'filename': os.path.join(BASE_DIR, 'debug.log'),
 #             'formatter':'default_formatter',
 #         }
 #     },
 #     'formatters':{
 #         'default_formatter':{
 #             'format': '{levelname} {asctime} {module} {message}',
-#             'style':'{' 
+#             'style':'{'
 #         }
 #     }
 # }
 
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'x-token'
-        },'api_key1': {
-            'type': 'apiKey',
-            'in': 'header',
-            'name': 'x-phoneno'
-        }
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "in": "header", "name": "x-token"},
+        "api_key1": {"type": "apiKey", "in": "header", "name": "x-phoneno"},
     },
 }
-
